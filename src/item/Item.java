@@ -14,12 +14,13 @@ public class Item {
 	}
 	
 	public boolean use() {
-		if (usable && (remainingUses == -1 || remainingUses > 0)) {
+		if(usable) {
 			if(remainingUses != -1) remainingUses --;
 			effect();
-			return true;
 		}
-		return false;
+		//should return whether or not the item has run out of uses
+		if (remainingUses == -1 || remainingUses > 0) return true;
+		else return false;
 	}
 	
 	//effect when used
@@ -31,12 +32,28 @@ public class Item {
 		return equippable;
 	}
 	
+	public void setEquippable(boolean equippable) {
+		this.equippable = equippable;
+	}
+	
 	public String getItemType() {
 		return itemType;
+	}
+	
+	public void setItemType(String itemType) {
+		this.itemType = itemType;
 	}
 	
 	//effect when equipped
 	public boolean equipEffect() {
 		return equippable;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setRemainingUses(int remainingUses) {
+		this.remainingUses = remainingUses;
 	}
 }

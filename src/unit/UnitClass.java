@@ -1,6 +1,7 @@
 package unit;
 import java.util.Dictionary;
 import item.Item;
+import board.Board;
 
 public class UnitClass {
 	
@@ -14,14 +15,14 @@ public class UnitClass {
 	}
 	
 	//possible solution to having different sets of actions for each class
-	public boolean act(String actionName, Unit unitA, Unit unitB) {
+	public boolean act(String actionName, Unit unitA, Unit unitB, Board board) {
 		int actionId = -1;
 		if(actions.get(actionName) != null) {
 			actionId = actions.get(actionName);
-			if(actionId == 0) actZero(unitA, unitB);
-			else if(actionId == 1) actOne(unitA, unitB);
-			else if(actionId == 2) actTwo(unitA, unitB);
-			else if(actionId == 3) actThree(unitA, unitB);
+			if(actionId == 0) actZero(unitA, unitB, board);
+			else if(actionId == 1) actOne(unitA, unitB, board);
+			else if(actionId == 2) actTwo(unitA, unitB, board);
+			else if(actionId == 3) actThree(unitA, unitB, board);
 			return true;
 		}
 		return false;
@@ -29,19 +30,19 @@ public class UnitClass {
 	
 	//each action method to be filled in specific classes
 	//e.g. dancer class actOne could be changed to a dance method
-	public boolean actZero(Unit unitA, Unit unitB) {
+	public boolean actZero(Unit unitA, Unit unitB, Board board) {
 		return false;
 	}
 	
-	public boolean actOne(Unit unitA, Unit unitB) {
+	public boolean actOne(Unit unitA, Unit unitB, Board board) {
 		return false;
 	}
 	
-	public boolean actTwo(Unit unitA, Unit unitB) {
+	public boolean actTwo(Unit unitA, Unit unitB, Board board) {
 		return false;
 	}
 	
-	public boolean actThree(Unit unitA, Unit unitB) {
+	public boolean actThree(Unit unitA, Unit unitB, Board board) {
 		return false;
 	}
 	
@@ -52,6 +53,10 @@ public class UnitClass {
 	
 	public String[] getEquippableItemTypes() {
 		return equippableItemTypes;
+	}
+	
+	public void setEquippableItemTypes(String[] equippableItemTypes) {
+		this.equippableItemTypes = equippableItemTypes;
 	}
 	
 	public boolean isEquippable(Item item) {

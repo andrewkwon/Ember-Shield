@@ -24,7 +24,8 @@ public class Unit {
 	
 	public boolean equip(int itemId) {
 		if(itemId < 0 || itemId >= inventorySpace) return false;
-		if(unitClass.isEquippable(inventory[itemId])) {
+		if(unitClass.getEquippableItemTypes() == null) return false;
+		if(inventory[itemId].getEquippable() && unitClass.isEquippable(inventory[itemId])) {
 			equipped = itemId;
 			inventory[itemId].equipEffect();
 			return true;
@@ -34,7 +35,7 @@ public class Unit {
 	
 	public boolean useItem(int itemId) {
 		if(itemId < 0 || itemId >= inventorySpace) return false;
-		inventory[itemId].use();
+		if(inventory[itemId].use() == false) removeItem(itemId);
 		return true;
 	}
 	
@@ -62,5 +63,17 @@ public class Unit {
 	
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+	
+	public void removeItem(int itemId) {
+		if(itemId == equipped) {
+			equipped = -1;
+			System.out.printf("%s has broken!\n", inventory[itemId].getName());
+		}
+		inventory[itemId] = null;
+	}
+	
+	public UnitClass getUnitClass() {
+		return unitClass;
 	}
 }
