@@ -1,4 +1,5 @@
 package item;
+import unit.Unit;
 
 public class Item {
 
@@ -13,18 +14,24 @@ public class Item {
 		this.name = name;
 	}
 	
-	public boolean use() {
+	public boolean use(Unit unitA) {
 		if(usable) {
-			if(remainingUses != -1) remainingUses --;
-			effect();
+			effect(unitA);
+			return wear();
 		}
-		//should return whether or not the item has run out of uses
+		return true;
+	}
+	
+	//lowers remaining item uses
+	public boolean wear() {
+		if(remainingUses != -1) remainingUses --;
+		//should return whether or not the item still has uses
 		if (remainingUses == -1 || remainingUses > 0) return true;
 		else return false;
 	}
 	
 	//effect when used
-	public boolean effect() {
+	public boolean effect(Unit unitA) {
 		return false;
 	}
 	
@@ -55,5 +62,13 @@ public class Item {
 	
 	public void setRemainingUses(int remainingUses) {
 		this.remainingUses = remainingUses;
+	}
+	
+	public int getRemainingUses() {
+		return remainingUses;
+	}
+	
+	public void setUsable(boolean usable) {
+		this.usable = usable;
 	}
 }

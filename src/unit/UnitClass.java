@@ -1,5 +1,5 @@
 package unit;
-import java.util.Dictionary;
+import java.util.Map;
 import item.Item;
 import board.Board;
 
@@ -8,10 +8,11 @@ public class UnitClass {
 	private String name;
 	private String[] equippableItemTypes;
 	//stat caps to be added?
-	private Dictionary<String, Integer> actions;
+	private Map<String, Integer> actions;
+	protected final int numberOfActions = 4;
 	
-	public UnitClass() {
-		
+	public UnitClass(String name) {
+		this.name = name;
 	}
 	
 	//possible solution to having different sets of actions for each class
@@ -70,5 +71,9 @@ public class UnitClass {
 			}
 		}
 		return equippable;
+	}
+	
+	public void setActions(Map<String, Integer> actions) {
+		this.actions = actions;
 	}
 }
