@@ -19,6 +19,8 @@ public class Unit {
 	private int equipped = -1;
 	private boolean canMove = true;
 	private boolean active = true;
+	private String faction;
+	private String side;
 	
 	public Unit(String name) {
 		this.name = name;
@@ -120,5 +122,21 @@ public class Unit {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public String getFaction() {
+		return faction;
+	}
+	
+	public void setFaction(String faction) {
+		this.faction = faction;
+	}
+	
+	public String getSide() {
+		return side;
+	}
+	
+	public void setSide(String side) {
+		this.side = side;
 	}
 }

@@ -35,4 +35,12 @@ public class Board {
 	public void setUnit(int row, int column, Unit unit) {
 		units[row][column] = unit;
 	}
+	
+	public int getBoardWidth() {
+		return boardWidth;
+	}
+	
+	public int getBoardHeight() {
+		return boardHeight;
+	}
 }

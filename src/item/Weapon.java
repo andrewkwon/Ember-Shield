@@ -2,7 +2,7 @@ package item;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Weapon extends Item {
+public class Weapon extends Equipment {
 
 	//weapon-specific attributes in Awakening are:
 	//Mt, Hit, Crt, Rng
@@ -11,8 +11,7 @@ public class Weapon extends Item {
 	
 	public Weapon(String name) {
 		super(name);
-		setEquippable(true);
-		String[] keys = {"Mt", "Hit", "Crt", "Rng"};
+		String[] keys = {"Mt", "Hit", "Crt"};
 		stats = new HashMap(keys.length);
 		for(String k : keys) stats.put(k, 0);
 	}
