@@ -1,26 +1,84 @@
 package game;
 import unit.Unit;
+import graphics.Screen;
+import graphics.SpriteSheet;
 import item.Item;
 import unit.UnitClass;
 import item.Weapon;
 import board.Board;
 import unit.UnitAttacker;
-import java.util.Scanner;
 
-public class Game implements Runnable {
+import java.util.Scanner;
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+
+import javax.swing.JFrame;
+
+import java.awt.Dimension;
+import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+
+public class Game extends Canvas implements Runnable {
 	
 	private boolean running;
+	private JFrame frame;
+	private int width = 32 * 36;
+	private int height = 32 * 15;
+	private final String name = "Ember Shield";
+	private int clock;
+	private BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+	private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+	private int[] colors = new int[SpriteSheet.COLOR_DEPTH * SpriteSheet.COLOR_DEPTH * SpriteSheet.COLOR_DEPTH];
+	private Screen screen;
+	private final int scale = 3;
 	private Board b;
+	private int[][] tileMap = {
+			{00, 01, 02, 19, 19, 19, 19, 19, 03, 19, 19, 19}, 
+			{12, 13, 13, 31, 19, 19, 31, 19, 03, 19, 19, 16}, 
+			{13, 13, 13, 13, 13, 34, 13, 14, 28, 19, 19, 19}, 
+			{07, 07, 07, 8, 13, 13, 13, 18, 15, 17, 19, 19}, 
+			{19, 19, 19, 19, 07, 07, 07, 19, 19, 00, 01, 01}};
 	private Unit fred;
 	private Unit bob;
 	private String objective = "DefeatAll";
 	
 	public Game() {
-		
+		super();
+		frame = new JFrame(name);
+		setPreferredSize(new Dimension(width, height));
+		setMinimumSize(new Dimension(width, height));
+		setMaximumSize(new Dimension(width, height));
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLayout(new BorderLayout());
+		frame.add(this, BorderLayout.CENTER);
+		frame.setResizable(false);
+		frame.pack();
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
 	}
 	
 	public synchronized void init() {
 		running = true;
+		clock = 0;
+		
+		for(int r = 0; r < SpriteSheet.COLOR_DEPTH; r++) {
+			for(int g = 0; g < SpriteSheet.COLOR_DEPTH; g++) {
+				for(int b = 0; b < SpriteSheet.COLOR_DEPTH; b++) {
+					int index = r * (SpriteSheet.COLOR_DEPTH * SpriteSheet.COLOR_DEPTH) + g * (SpriteSheet.COLOR_DEPTH) + b;
+					int col = ((r * 0xFF / SpriteSheet.COLOR_DEPTH) << 16) + ((g * 0xFF / SpriteSheet.COLOR_DEPTH) << 8) + (b * 0xFF / SpriteSheet.COLOR_DEPTH);
+					System.out.printf("r: %d g: %d b: %d \n", r, g, b);
+					System.out.printf("index: %d, col: %d \n", index, col);
+					colors[index] = col;
+				}
+			}
+		}
+		screen = new Screen(width, height);
+		screen.setSheet(new SpriteSheet("/Untitled.png"));
+		
 		fred = new Unit("Fred");
 		bob = new Unit("Bob");
 		b = new Board(1, 2);
@@ -51,8 +109,41 @@ public class Game implements Runnable {
 	
 	public void run() {
 		init();
+		int tickCount = 0;
+		int frameCount = 0;
+		long lastCheck = System.currentTimeMillis();
+		long lastUpdate = System.nanoTime();
+		double nanoSecondsBetweenTicks = 1000000000D/60D;
+		long ticksPassed = 0;
 		while(running) {
-			display(b);
+			//renders and ticks
+			long now = System.nanoTime();
+			ticksPassed += (now - lastUpdate) / nanoSecondsBetweenTicks;
+			
+			if(ticksPassed >= 1) {
+				update();
+				ticksPassed --;
+				tickCount++;
+				lastUpdate  = now;
+			}
+			
+			render();
+			frameCount++;
+			try{
+				Thread.sleep(2);
+			}
+			catch(Exception ex) {
+				ex.printStackTrace();
+			}
+				
+			if(System.currentTimeMillis() - lastCheck >= 1000) {
+				lastCheck = System.currentTimeMillis();
+				System.out.printf("tps: %d, fps: %d\n", tickCount, frameCount);
+				tickCount = 0;
+				frameCount = 0;
+			}
+			
+			/*display(b);
 			takeCommand(b);
 			if(hasWon(objective, b)) {
 				System.out.println("YOU WIN");
@@ -61,14 +152,36 @@ public class Game implements Runnable {
 			else if(hasLost(b)) {
 				System.out.println("GAME OVER");
 				stop();
-			}
-			try {
-				Thread.sleep(20);
-			}
-			catch(Exception ex) {
-				ex.printStackTrace();
+			}*/
+		}
+	}
+	
+	public void update() {
+		clock++;
+	}
+	
+	public void render() {
+		BufferStrategy bs = getBufferStrategy();
+		if(bs == null) {
+			createBufferStrategy(3);
+			return;
+		}
+		Graphics g = bs.getDrawGraphics();
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width, height);
+		
+		for(int x = 0; x < 12; x++) {
+			for(int y = 0; y < 5; y++) {
+				screen.render(x, y, tileMap[y][x], scale);
 			}
 		}
+		for(int i = 0; i < pixels.length; i++) {
+			pixels[i] = colors[screen.getPixels()[i]];
+		}
+		
+		g.drawImage(image, 0, 0, width, height, null);
+		g.dispose();
+		bs.show();
 	}
 	
 	public void display(Board board) {
