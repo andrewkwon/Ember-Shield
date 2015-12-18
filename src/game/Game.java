@@ -6,6 +6,7 @@ import item.Item;
 import unit.UnitClass;
 import item.Weapon;
 import board.Board;
+import board.Land;
 import unit.UnitAttacker;
 
 import java.util.Scanner;
@@ -16,6 +17,8 @@ import java.awt.Graphics;
 import java.awt.Image;
 
 import javax.swing.JFrame;
+
+import controls.KeyboardControls;
 
 import java.awt.Dimension;
 import java.awt.image.BufferStrategy;
@@ -35,13 +38,15 @@ public class Game extends Canvas implements Runnable {
 	private int[] colors = new int[SpriteSheet.COLOR_DEPTH * SpriteSheet.COLOR_DEPTH * SpriteSheet.COLOR_DEPTH];
 	private Screen screen;
 	private final int scale = 3;
+	private KeyboardControls kc;
 	private Board b;
 	private int[][] tileMap = {
-			{00, 01, 02, 19, 19, 19, 19, 19, 03, 19, 19, 19}, 
-			{12, 13, 13, 31, 19, 19, 31, 19, 03, 19, 19, 16}, 
-			{13, 13, 13, 13, 13, 34, 13, 14, 28, 19, 19, 19}, 
-			{07, 07, 07, 8, 13, 13, 13, 18, 15, 17, 19, 19}, 
-			{19, 19, 19, 19, 07, 07, 07, 19, 19, 00, 01, 01}};
+			{00, 01, 02, 19, 19, 19, 19, 19, 03, 19, 19, 19, 30}, 
+			{12, 13, 13, 31, 19, 19, 31, 19, 03, 19, 19, 16, 21}, 
+			{13, 13, 13, 13, 13, 34, 13, 14, 28, 19, 19, 19, 14}, 
+			{07, 07, 07, 8, 13, 13, 13, 18, 15, 17, 19, 19, 32}, 
+			{19, 19, 19, 19, 07, 07, 07, 19, 19, 00, 01, 01, 02},
+			{01, 03, 05, 9, 00, 13, 15, 14, 16, 17, 18, 25, 24}};
 	private Unit fred;
 	private Unit bob;
 	private String objective = "DefeatAll";
@@ -59,6 +64,7 @@ public class Game extends Canvas implements Runnable {
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+		addKeyListener(kc = new KeyboardControls());
 	}
 	
 	public synchronized void init() {
@@ -77,11 +83,18 @@ public class Game extends Canvas implements Runnable {
 			}
 		}
 		screen = new Screen(width, height);
-		screen.setSheet(new SpriteSheet("/Untitled.png"));
+		
+		b = new Board(tileMap[0].length, tileMap.length);
+		b.setLandSpriteSheetPath("/Untitled.png");
+		Land[][] terrain = new Land[tileMap.length][tileMap[0].length];
+		for(int x = 0; x < tileMap[0].length; x++) {
+			for(int y = 0; y < tileMap.length; y++) {
+				b.setLand(y, x, new Land("Test Land", tileMap[y][x]));
+			}
+		}
 		
 		fred = new Unit("Fred");
 		bob = new Unit("Bob");
-		b = new Board(1, 2);
 		b.setUnit(0, 0, fred);
 		b.setUnit(0, 1, bob);
 		String[] types = {"freddish"};
@@ -112,19 +125,19 @@ public class Game extends Canvas implements Runnable {
 		int tickCount = 0;
 		int frameCount = 0;
 		long lastCheck = System.currentTimeMillis();
-		long lastUpdate = System.nanoTime();
-		double nanoSecondsBetweenTicks = 1000000000D/60D;
-		long ticksPassed = 0;
+		long lastTime = System.nanoTime();
+		double ticksPerNanoSecond = 60D/1000000000D;
+		double ticksPassed = 0;
 		while(running) {
 			//renders and ticks
 			long now = System.nanoTime();
-			ticksPassed += (now - lastUpdate) / nanoSecondsBetweenTicks;
+			ticksPassed += (now - lastTime) * ticksPerNanoSecond;
+			lastTime = now;
 			
-			if(ticksPassed >= 1) {
+			while(ticksPassed >= 1) {
 				update();
-				ticksPassed --;
+				ticksPassed -= 1;
 				tickCount++;
-				lastUpdate  = now;
 			}
 			
 			render();
@@ -137,7 +150,7 @@ public class Game extends Canvas implements Runnable {
 			}
 				
 			if(System.currentTimeMillis() - lastCheck >= 1000) {
-				lastCheck = System.currentTimeMillis();
+				lastCheck += 1000;
 				System.out.printf("tps: %d, fps: %d\n", tickCount, frameCount);
 				tickCount = 0;
 				frameCount = 0;
@@ -158,6 +171,11 @@ public class Game extends Canvas implements Runnable {
 	
 	public void update() {
 		clock++;
+		for(int i = 0; i < scale && kc.upPressed && screen.yOffset < 0; i++) screen.yOffset++;
+		for(int i = 0; i < scale && kc.leftPressed && screen.xOffset < 0; i++) screen.xOffset++;
+		for(int i = 0; i < scale && kc.rightPressed && screen.xOffset > width - b.getBoardWidth() * SpriteSheet.TILE_WIDTH * scale; i++) screen.xOffset--;
+		for(int i = 0; i < scale && kc.downPressed && screen.yOffset > height - b.getBoardHeight() * SpriteSheet.TILE_WIDTH * scale; i++) screen.yOffset--;
+		b.update(clock);
 	}
 	
 	public void render() {
@@ -167,14 +185,9 @@ public class Game extends Canvas implements Runnable {
 			return;
 		}
 		Graphics g = bs.getDrawGraphics();
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, width, height);
 		
-		for(int x = 0; x < 12; x++) {
-			for(int y = 0; y < 5; y++) {
-				screen.render(x, y, tileMap[y][x], scale);
-			}
-		}
+		b.render(screen, scale);
+		
 		for(int i = 0; i < pixels.length; i++) {
 			pixels[i] = colors[screen.getPixels()[i]];
 		}

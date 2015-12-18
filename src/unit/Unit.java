@@ -1,8 +1,13 @@
 package unit;
 import java.util.Map;
+
 import item.Item;
 import board.Board;
+
 import java.util.HashMap;
+
+import graphics.Screen;
+import graphics.Sprite;
 
 public class Unit {
 	
@@ -21,6 +26,7 @@ public class Unit {
 	private boolean active = true;
 	private String faction;
 	private String side;
+	private Sprite sprite;
 	
 	public Unit(String name) {
 		this.name = name;
@@ -29,6 +35,8 @@ public class Unit {
 		growthRates = new HashMap(keys.length);
 		for(String k : keys) stats.put(k, 0);
 		growthRates.putAll(stats);
+		//TODO: remove and generalize
+		sprite = new Sprite(null, 32, 32);
 	}
 	
 	public boolean equip(int itemId) {
@@ -100,6 +108,15 @@ public class Unit {
 		board.removeUnit(this);
 	}
 	
+	public void update(int clock) {
+		//updates sprite animation or other things which need continuous updating
+		sprite.update(clock);
+	}
+	
+	public void render(Screen screen, int scale) {
+		sprite.render(screen, scale);
+	}
+	
 	public UnitClass getUnitClass() {
 		return unitClass;
 	}
@@ -138,5 +155,9 @@ public class Unit {
 	
 	public void setSide(String side) {
 		this.side = side;
+	}
+	
+	public Sprite getSprite() {
+		return sprite;
 	}
 }

@@ -49,4 +49,8 @@ public class SpriteSheet {
 	public int getHeight() {
 		return height;
 	}
+	
+	public String getPath() {
+		return path;
+	}
 }
