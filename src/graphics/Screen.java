@@ -8,6 +8,8 @@ public class Screen {
 	private int[] pixels;
 	public int xOffset = 0;
 	public int yOffset = 0;
+	//noncolor: not used as a color value, pixels can't have this as a color value
+	public static int NONCOLOR = -2;
 	
 	public Screen(int width, int height) {
 		this.width = width;
@@ -15,7 +17,7 @@ public class Screen {
 		pixels = new int[width * height];
 	}
 	
-	public void render(int x, int y, int tile, int scale) {
+	public void render(int x, int y, int tile, int scale, int color, int targetColor) {
 		int tileX = tile % (sheet.getWidth() / SpriteSheet.TILE_WIDTH);
 		int tileY = (int) tile / (sheet.getWidth() / SpriteSheet.TILE_WIDTH);
 		for(int pixelX = 0; pixelX < SpriteSheet.TILE_WIDTH * scale; pixelX++) {
@@ -25,7 +27,8 @@ public class Screen {
 					int actualY = pixelY + y * scale + yOffset;
 					if(0 <= actualY && actualY < height) {
 						int pixelData = sheet.getPixels()[tileX * SpriteSheet.TILE_WIDTH + (pixelX / scale) + (tileY * SpriteSheet.TILE_WIDTH + (pixelY / scale)) * sheet.getWidth()];
-						if(pixelData != -1){
+						if(pixelData == color) pixelData = targetColor;
+						if(pixelData != SpriteSheet.TRANSPARENT_COLOR){
 							pixels[actualX + actualY * width] = 
 									pixelData;
 						}

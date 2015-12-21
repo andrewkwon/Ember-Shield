@@ -16,6 +16,8 @@ public class SpriteSheet {
 	private int height;
 	public static final int TILE_WIDTH = 32;
 	public static final int COLOR_DEPTH = 8;
+	//transparent color: pixel of this color not rendered
+	public static final int TRANSPARENT_COLOR = -1;
 	
 	public SpriteSheet(String path) {
 		BufferedImage image = null;
@@ -31,7 +33,7 @@ public class SpriteSheet {
 		height = image.getHeight();
 		pixels = image.getRGB(0, 0, width, height, null, 0, width);
 		for(int i = 0; i < pixels.length; i++) {
-			if((int) ((pixels[i] >> 24) & 0xFF) == 0) pixels[i] = -1;
+			if((int) ((pixels[i] >> 24) & 0xFF) == 0) pixels[i] = TRANSPARENT_COLOR;
 			else {
 				int r = (int) (((pixels[i] >> 16) & 0xFF) / (256 / COLOR_DEPTH));
 				int g = (int) (((pixels[i] >> 8) & 0xFF) / (256 / COLOR_DEPTH));

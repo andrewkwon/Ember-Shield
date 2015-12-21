@@ -1,12 +1,17 @@
 package graphics;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Scanner;
 
 public class Sprite {
 
 	private String spriteSheetPath;
+	//motions txt file hold frame change times, frame indexes, animation duration
+	private String motionsFilePath;
+	private int motionsStartLine;
 	//animations maps animation name to a mapping of times to switch frames(not durations) to frame
 	//animations.get(currentAnimation).get(-1) should return length of animation
 	private Map<String, Map<Integer, Integer>> animations;
@@ -16,27 +21,48 @@ public class Sprite {
 	private int animationStartTime = -1;
 	private int x;
 	private int y;
+	private int colorToSwap = Screen.NONCOLOR;
+	private int swapTargetColor = Screen.NONCOLOR;
 	
-	public Sprite(String spriteSheetPath, int x, int y) {
+	public Sprite(String spriteSheetPath) {
 		this.spriteSheetPath = spriteSheetPath;
-		this.x = x;
-		this.y = y;
 		animations = new HashMap<String, Map<Integer, Integer>>();
 		load();
 	}
 	
-	//TODO: fill with actual loading code
 	public void load() {
+		//TODO: make path adjustable
 		spriteSheetPath = "/Untitled.png";
-		Map<Integer, Integer> f = new HashMap<Integer, Integer>();
-		f.put(-1, 60);
-		f.put(0, 36);
-		f.put(30, 37);
-		animations.put("Idle", f);
+		motionsFilePath = "res/TestMotions.txt";
+		motionsStartLine = 5;
+		Scanner scanner = null;
+		try{
+			scanner = new Scanner(new File(motionsFilePath));
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		//sets scanner to correct line
+		for(int i = 1; i < motionsStartLine; i++) scanner.nextLine();
+		String lineStart = scanner.next();
+		System.out.println(lineStart);
+		while(!lineStart.equals("End")) {
+			Map<Integer, Integer> anim = new HashMap<Integer, Integer>();
+			String nextDataPiece = scanner.next();
+			while(!nextDataPiece.equals("End")) {
+				int timeChange = Integer.parseInt(nextDataPiece);
+				int frame = Integer.parseInt(scanner.next());
+				anim.put(timeChange, frame);
+				nextDataPiece = scanner.next();
+			}
+			animations.put(lineStart, anim);
+			lineStart = scanner.next();
+		}
+		scanner.close();
+		System.out.println(animations);
 	}
 	
 	public void update(int clock) {
-		if(animationStartTime == -1) changeAnimationTo("Idle", clock);
 		int animationTime = (clock - animationStartTime) % animationLength;
 		Set<Integer> times = animations.get(currentAnimation).keySet();
 		//time for the frame we are on
@@ -53,7 +79,7 @@ public class Sprite {
 	
 	public void render(Screen screen, int scale) {
 		screen.setSheet(spriteSheetPath);
-		screen.render(x, y, currentFrame, scale);
+		screen.render(x, y, currentFrame, scale, colorToSwap, swapTargetColor);
 	}
 	
 	public int getX() {
@@ -76,5 +102,9 @@ public class Sprite {
 		currentAnimation = newAnimation;
 		animationStartTime = clock;
 		animationLength = animations.get(currentAnimation).get(-1);
+	}
+	
+	public String getCurrentAnimation() {
+		return currentAnimation;
 	}
 }

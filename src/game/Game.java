@@ -76,8 +76,8 @@ public class Game extends Canvas implements Runnable {
 				for(int b = 0; b < SpriteSheet.COLOR_DEPTH; b++) {
 					int index = r * (SpriteSheet.COLOR_DEPTH * SpriteSheet.COLOR_DEPTH) + g * (SpriteSheet.COLOR_DEPTH) + b;
 					int col = ((r * 0xFF / SpriteSheet.COLOR_DEPTH) << 16) + ((g * 0xFF / SpriteSheet.COLOR_DEPTH) << 8) + (b * 0xFF / SpriteSheet.COLOR_DEPTH);
-					System.out.printf("r: %d g: %d b: %d \n", r, g, b);
-					System.out.printf("index: %d, col: %d \n", index, col);
+					//System.out.printf("r: %d g: %d b: %d \n", r, g, b);
+					//System.out.printf("index: %d, col: %d \n", index, col);
 					colors[index] = col;
 				}
 			}
@@ -238,6 +238,7 @@ public class Game extends Canvas implements Runnable {
 				}
 			}
 		}
+		sc.close();
 	}
 	
 	public synchronized void stop() {

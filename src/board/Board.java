@@ -47,6 +47,25 @@ public class Board {
 		return boardHeight;
 	}
 	
+	//moves unit one space
+	public boolean moveUnit(int row, int column, int direction) {
+		//direction: 0=right, 1=up, 2=left, 3=down
+		int xDir = 0;
+		int yDir = 0;
+		if(direction % 4 == 0) xDir = 1;
+		else if(direction % 4 == 1) yDir = 1;
+		else if(direction % 4 == 2) xDir = -1;
+		else if(direction % 4 == 3) yDir = -1;
+		if(row + yDir < 0 || row + yDir >= boardHeight ||
+				column + xDir < 0 || column + xDir >= boardWidth ||
+				units[row][column] != null) return false;
+		else {
+			units[row + yDir][column + xDir] = units[row][column];
+			units[row][column] = null;
+			return true;
+		}
+	}
+	
 	public void update(int clock) {
 		for(int row = 0; row < 1; row++) {
 			for(int column = 0; column < 2; column++) {
@@ -67,7 +86,7 @@ public class Board {
 		for(int row = 0; row < 1; row++) {
 			for(int column = 0; column < 2; column++) {
 				if(units[row][column] != null) {
-					units[row][column].render(screen, scale);
+					units[row][column].render(screen, scale, column * SpriteSheet.TILE_WIDTH, row * SpriteSheet.TILE_WIDTH);
 				}
 			}
 		}

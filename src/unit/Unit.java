@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import graphics.Screen;
 import graphics.Sprite;
+import graphics.SpriteSheet;
 
 public class Unit {
 	
@@ -27,6 +28,8 @@ public class Unit {
 	private String faction;
 	private String side;
 	private Sprite sprite;
+	private int xOffset = 0;
+	private int yOffset = 0;
 	
 	public Unit(String name) {
 		this.name = name;
@@ -36,7 +39,7 @@ public class Unit {
 		for(String k : keys) stats.put(k, 0);
 		growthRates.putAll(stats);
 		//TODO: remove and generalize
-		sprite = new Sprite(null, 32, 32);
+		sprite = new Sprite(null);
 	}
 	
 	public boolean equip(int itemId) {
@@ -108,12 +111,16 @@ public class Unit {
 		board.removeUnit(this);
 	}
 	
+	//TODO: add changing of animations
 	public void update(int clock) {
 		//updates sprite animation or other things which need continuous updating
+		if(sprite.getCurrentAnimation() == null) sprite.changeAnimationTo("Idle", clock);
 		sprite.update(clock);
 	}
 	
-	public void render(Screen screen, int scale) {
+	public void render(Screen screen, int scale, int x, int y) {
+		sprite.setX(x + xOffset);
+		sprite.setY(y + yOffset);
 		sprite.render(screen, scale);
 	}
 	

@@ -16,6 +16,6 @@ public class Land {
 	}
 	
 	public void render(Screen screen, int x, int y, int scale) {
-		screen.render(x, y, tile, scale);
+		screen.render(x, y, tile, scale, Screen.NONCOLOR, Screen.NONCOLOR);
 	}
 }
