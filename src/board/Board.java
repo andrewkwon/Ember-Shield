@@ -11,6 +11,8 @@ public class Board {
 	private Unit[][] units;
 	private Form[][] forms;
 	private String landSpriteSheetPath;
+	private int selectedRow;
+	private int selectedColumn;
 	
 	public Board(int boardWidth, int boardHeight) {
 		this.boardHeight = boardHeight;

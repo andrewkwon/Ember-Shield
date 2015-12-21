@@ -1,6 +1,5 @@
 package graphics;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -24,20 +23,18 @@ public class Sprite {
 	private int colorToSwap = Screen.NONCOLOR;
 	private int swapTargetColor = Screen.NONCOLOR;
 	
-	public Sprite(String spriteSheetPath) {
+	public Sprite(String spriteSheetPath, String motionsFilePath, int motionsStartLine) {
 		this.spriteSheetPath = spriteSheetPath;
+		this.motionsFilePath = motionsFilePath;
+		this.motionsStartLine = motionsStartLine;
 		animations = new HashMap<String, Map<Integer, Integer>>();
 		load();
 	}
 	
 	public void load() {
-		//TODO: make path adjustable
-		spriteSheetPath = "/Untitled.png";
-		motionsFilePath = "res/TestMotions.txt";
-		motionsStartLine = 5;
 		Scanner scanner = null;
 		try{
-			scanner = new Scanner(new File(motionsFilePath));
+			scanner = new Scanner(Sprite.class.getResourceAsStream(motionsFilePath));
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
@@ -106,5 +103,13 @@ public class Sprite {
 	
 	public String getCurrentAnimation() {
 		return currentAnimation;
+	}
+
+	public void setColorToSwap(int colorToSwap) {
+		this.colorToSwap = colorToSwap;
+	}
+	
+	public void setSwapTargetColor(int swapTargetColor) {
+		this.swapTargetColor = swapTargetColor;
 	}
 }

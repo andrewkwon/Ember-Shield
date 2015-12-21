@@ -27,19 +27,22 @@ public class Unit {
 	private boolean active = true;
 	private String faction;
 	private String side;
+	public static final int PLAYER_OUTLINE = 1;
+	public static final int ENEMY_OUTLINE = 64;
+	public static final int ALLY_OUTLINE = 8;
+	public static final int NEUTRAL_OUTLINE = PLAYER_OUTLINE + ENEMY_OUTLINE;
 	private Sprite sprite;
 	private int xOffset = 0;
 	private int yOffset = 0;
 	
-	public Unit(String name) {
+	public Unit(String name, String spriteSheetPath, String motionsFilePath, int motionsStartLine) {
 		this.name = name;
 		String[] keys = {"HP", "Str", "Mag", "Skl", "Spd", "Lck", "Def", "Res", "Move"};
 		stats = new HashMap(keys.length);
 		growthRates = new HashMap(keys.length);
 		for(String k : keys) stats.put(k, 0);
 		growthRates.putAll(stats);
-		//TODO: remove and generalize
-		sprite = new Sprite(null);
+		sprite = new Sprite(spriteSheetPath, motionsFilePath, motionsStartLine);
 	}
 	
 	public boolean equip(int itemId) {
@@ -162,6 +165,11 @@ public class Unit {
 	
 	public void setSide(String side) {
 		this.side = side;
+		sprite.setColorToSwap(0);
+		if(side.equals("Player")) sprite.setSwapTargetColor(PLAYER_OUTLINE);
+		else if(side.equals("Enemy")) sprite.setSwapTargetColor(ENEMY_OUTLINE);
+		else if(side.equals("Ally")) sprite.setSwapTargetColor(ALLY_OUTLINE);
+		else if(side.equals("Neutral")) sprite.setSwapTargetColor(NEUTRAL_OUTLINE);
 	}
 	
 	public Sprite getSprite() {

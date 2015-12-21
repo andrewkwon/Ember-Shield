@@ -15,12 +15,16 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 
 import javax.swing.JFrame;
 
+import controls.Cursor;
 import controls.KeyboardControls;
 
 import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -40,6 +44,7 @@ public class Game extends Canvas implements Runnable {
 	private final int scale = 3;
 	private KeyboardControls kc;
 	private Board b;
+	private Cursor cursor;
 	private int[][] tileMap = {
 			{00, 01, 02, 19, 19, 19, 19, 19, 03, 19, 19, 19, 30}, 
 			{12, 13, 13, 31, 19, 19, 31, 19, 03, 19, 19, 16, 21}, 
@@ -50,6 +55,8 @@ public class Game extends Canvas implements Runnable {
 	private Unit fred;
 	private Unit bob;
 	private String objective = "DefeatAll";
+	private boolean currentlyUpdating = false;
+	private boolean currentlyRendering = false;
 	
 	public Game() {
 		super();
@@ -57,7 +64,15 @@ public class Game extends Canvas implements Runnable {
 		setPreferredSize(new Dimension(width, height));
 		setMinimumSize(new Dimension(width, height));
 		setMaximumSize(new Dimension(width, height));
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent we) {
+				while(currentlyUpdating == true || currentlyRendering == true) Thread.yield();
+				stop();
+				frame.setVisible(false);
+				frame.dispose();
+			}
+		});
 		frame.setLayout(new BorderLayout());
 		frame.add(this, BorderLayout.CENTER);
 		frame.setResizable(false);
@@ -65,6 +80,7 @@ public class Game extends Canvas implements Runnable {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		addKeyListener(kc = new KeyboardControls());
+		addMouseListener(cursor = new Cursor());
 	}
 	
 	public synchronized void init() {
@@ -93,8 +109,8 @@ public class Game extends Canvas implements Runnable {
 			}
 		}
 		
-		fred = new Unit("Fred");
-		bob = new Unit("Bob");
+		fred = new Unit("Fred", "/Untitled.png", "/TestMotions.txt", 5);
+		bob = new Unit("Bob", "/Untitled.png", "/TestMotions.txt", 5);
 		b.setUnit(0, 0, fred);
 		b.setUnit(0, 1, bob);
 		String[] types = {"freddish"};
@@ -135,12 +151,16 @@ public class Game extends Canvas implements Runnable {
 			lastTime = now;
 			
 			while(ticksPassed >= 1) {
+				currentlyUpdating = true;
 				update();
+				currentlyUpdating = false;
 				ticksPassed -= 1;
 				tickCount++;
 			}
 			
+			currentlyRendering = true;
 			render();
+			currentlyRendering = false;
 			frameCount++;
 			try{
 				Thread.sleep(2);
@@ -176,6 +196,17 @@ public class Game extends Canvas implements Runnable {
 		for(int i = 0; i < scale && kc.rightPressed && screen.xOffset > width - b.getBoardWidth() * SpriteSheet.TILE_WIDTH * scale; i++) screen.xOffset--;
 		for(int i = 0; i < scale && kc.downPressed && screen.yOffset > height - b.getBoardHeight() * SpriteSheet.TILE_WIDTH * scale; i++) screen.yOffset--;
 		b.update(clock);
+		Point point = getMousePosition();
+		if(point != null) { 
+			cursor.update(clock, screen, point.x, point.y, scale);
+			if(cursor.x / SpriteSheet.TILE_WIDTH >= 0 && cursor.x / SpriteSheet.TILE_WIDTH < b.getBoardWidth() &&
+				cursor.y / SpriteSheet.TILE_WIDTH >= 0 && cursor.y / SpriteSheet.TILE_WIDTH < b.getBoardHeight()) {
+				Unit cursorUnit = b.getUnits()[cursor.y / SpriteSheet.TILE_WIDTH][cursor.x / SpriteSheet.TILE_WIDTH];
+				if(cursorUnit == null) cursor.setSpriteColor(0);
+				else if(cursorUnit.getSide().equals("Player")) cursor.setSpriteColor(7);
+				else if(cursorUnit.getSide().equals("Enemy")) cursor.setSpriteColor(448);	
+			}
+		}
 	}
 	
 	public void render() {
@@ -187,6 +218,7 @@ public class Game extends Canvas implements Runnable {
 		Graphics g = bs.getDrawGraphics();
 		
 		b.render(screen, scale);
+		cursor.render(screen, scale);
 		
 		for(int i = 0; i < pixels.length; i++) {
 			if (screen.getPixels()[i] != -1) {
