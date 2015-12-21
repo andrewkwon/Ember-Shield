@@ -24,8 +24,11 @@ public class Screen {
 				for(int pixelY = 0; pixelY < SpriteSheet.TILE_WIDTH * scale; pixelY++) {
 					int actualY = pixelY + y * scale + yOffset;
 					if(0 <= actualY && actualY < height) {
-						pixels[actualX + actualY * width] = 
-							sheet.getPixels()[tileX * SpriteSheet.TILE_WIDTH + (pixelX / scale) + (tileY * SpriteSheet.TILE_WIDTH + (pixelY / scale)) * sheet.getWidth()];
+						int pixelData = sheet.getPixels()[tileX * SpriteSheet.TILE_WIDTH + (pixelX / scale) + (tileY * SpriteSheet.TILE_WIDTH + (pixelY / scale)) * sheet.getWidth()];
+						if(pixelData != -1){
+							pixels[actualX + actualY * width] = 
+									pixelData;
+						}
 					}
 				}
 			}

@@ -29,15 +29,9 @@ public class Sprite {
 	public void load() {
 		spriteSheetPath = "/Untitled.png";
 		Map<Integer, Integer> f = new HashMap<Integer, Integer>();
-		f.put(-1, 40);
-		f.put(0, 27);
-		f.put(5, 33);
-		f.put(10, 27);
-		f.put(15, 33);
-		f.put(20, 27);
-		f.put(25, 33);
-		f.put(30, 27);
-		f.put(35, 33);
+		f.put(-1, 60);
+		f.put(0, 36);
+		f.put(30, 37);
 		animations.put("Idle", f);
 	}
 	

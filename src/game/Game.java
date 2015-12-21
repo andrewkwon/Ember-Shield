@@ -189,7 +189,9 @@ public class Game extends Canvas implements Runnable {
 		b.render(screen, scale);
 		
 		for(int i = 0; i < pixels.length; i++) {
-			pixels[i] = colors[screen.getPixels()[i]];
+			if (screen.getPixels()[i] != -1) {
+				pixels[i] = colors[screen.getPixels()[i]];
+			}
 		}
 		
 		g.drawImage(image, 0, 0, width, height, null);

@@ -31,10 +31,13 @@ public class SpriteSheet {
 		height = image.getHeight();
 		pixels = image.getRGB(0, 0, width, height, null, 0, width);
 		for(int i = 0; i < pixels.length; i++) {
-			int r = (int) (((pixels[i] >> 16) & 0xFF) / (256 / COLOR_DEPTH));
-			int g = (int) (((pixels[i] >> 8) & 0xFF) / (256 / COLOR_DEPTH));
-			int b = (int) (((pixels[i]) & 0xFF) / (256 / COLOR_DEPTH));
-			pixels[i] = (int) r * COLOR_DEPTH * COLOR_DEPTH + g * COLOR_DEPTH + b;
+			if((int) ((pixels[i] >> 24) & 0xFF) == 0) pixels[i] = -1;
+			else {
+				int r = (int) (((pixels[i] >> 16) & 0xFF) / (256 / COLOR_DEPTH));
+				int g = (int) (((pixels[i] >> 8) & 0xFF) / (256 / COLOR_DEPTH));
+				int b = (int) (((pixels[i]) & 0xFF) / (256 / COLOR_DEPTH));
+				pixels[i] = (int) r * COLOR_DEPTH * COLOR_DEPTH + g * COLOR_DEPTH + b;
+			}
 		}
 	}
 	
