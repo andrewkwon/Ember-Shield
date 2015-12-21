@@ -1,9 +1,13 @@
 package graphics;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Screen {
 
 	private int width;
 	private int height;
+	private Map<String, SpriteSheet> loadedSheets = new HashMap<String, SpriteSheet>(5); 
 	private SpriteSheet sheet;
 	private int[] pixels;
 	public int xOffset = 0;
@@ -43,7 +47,13 @@ public class Screen {
 	}
 	
 	public void setSheet(String spriteSheetPath) {
-		if(sheet == null || !sheet.getPath().equals(spriteSheetPath)) sheet = new SpriteSheet(spriteSheetPath);
+		if(sheet == null || !sheet.getPath().equals(spriteSheetPath)) {
+			if(loadedSheets.containsKey(spriteSheetPath)) sheet = loadedSheets.get(spriteSheetPath); 
+			else {
+				sheet = new SpriteSheet(spriteSheetPath);
+				loadedSheets.put(spriteSheetPath, sheet);
+			}
+		}
 	}
 	
 	public int[] getPixels() {
@@ -64,5 +74,9 @@ public class Screen {
 	
 	public int getHeight() {
 		return height;
+	}
+	
+	public void clearLoadedSheets() {
+		loadedSheets.clear();
 	}
 }
