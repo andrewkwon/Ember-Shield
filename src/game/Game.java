@@ -17,6 +17,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import controls.Cursor;
@@ -78,6 +79,7 @@ public class Game extends Canvas implements Runnable {
 		frame.setResizable(false);
 		frame.pack();
 		frame.setLocationRelativeTo(null);
+		frame.setIconImage(new ImageIcon("res/EmberShieldIcon.png").getImage());
 		frame.setVisible(true);
 		addKeyListener(kc = new KeyboardControls());
 		addMouseListener(cursor = new Cursor());
@@ -119,11 +121,11 @@ public class Game extends Canvas implements Runnable {
 		fred.getUnitClass().setEquippableItemTypes(types);
 		fred.setStat("HP", 2);
 		fred.setStat("Str", 1);
-		fred.setSide("Player");
+		fred.setSide("Ally");
 		bob.setUnitClass(new UnitClass("freddy"));
 		bob.setStat("HP", 2);
 		bob.setStat("Str", 1);
-		bob.setSide("Enemy");
+		bob.setSide("Neutral");
 		
 		Weapon fredinator = new Weapon("Fredinator");
 		fredinator.setUsable(true);
@@ -174,6 +176,8 @@ public class Game extends Canvas implements Runnable {
 				System.out.printf("tps: %d, fps: %d\n", tickCount, frameCount);
 				tickCount = 0;
 				frameCount = 0;
+				int[] directions = {3, 1, 3, 0, 0, 0, 1, 0, 3, 3, 2, 2, 2, 1};
+				b.moveUnitAlongPath(0, 0, directions);
 			}
 			
 			/*display(b);
@@ -191,10 +195,10 @@ public class Game extends Canvas implements Runnable {
 	
 	public void update() {
 		clock++;
-		for(int i = 0; i < scale && kc.upPressed && screen.yOffset < 0; i++) screen.yOffset++;
-		for(int i = 0; i < scale && kc.leftPressed && screen.xOffset < 0; i++) screen.xOffset++;
-		for(int i = 0; i < scale && kc.rightPressed && screen.xOffset > width - b.getBoardWidth() * SpriteSheet.TILE_WIDTH * scale; i++) screen.xOffset--;
-		for(int i = 0; i < scale && kc.downPressed && screen.yOffset > height - b.getBoardHeight() * SpriteSheet.TILE_WIDTH * scale; i++) screen.yOffset--;
+		for(int i = 0; i < scale && kc.getKey(kc.up) && screen.yOffset < 0; i++) screen.yOffset++;
+		for(int i = 0; i < scale && kc.getKey(kc.left) && screen.xOffset < 0; i++) screen.xOffset++;
+		for(int i = 0; i < scale && kc.getKey(kc.right) && screen.xOffset > width - b.getBoardWidth() * SpriteSheet.TILE_WIDTH * scale; i++) screen.xOffset--;
+		for(int i = 0; i < scale && kc.getKey(kc.down) && screen.yOffset > height - b.getBoardHeight() * SpriteSheet.TILE_WIDTH * scale; i++) screen.yOffset--;
 		b.update(clock);
 		Point point = getMousePosition();
 		if(point != null) { 
@@ -203,8 +207,10 @@ public class Game extends Canvas implements Runnable {
 				cursor.y / SpriteSheet.TILE_WIDTH >= 0 && cursor.y / SpriteSheet.TILE_WIDTH < b.getBoardHeight()) {
 				Unit cursorUnit = b.getUnits()[cursor.y / SpriteSheet.TILE_WIDTH][cursor.x / SpriteSheet.TILE_WIDTH];
 				if(cursorUnit == null) cursor.setSpriteColor(0);
-				else if(cursorUnit.getSide().equals("Player")) cursor.setSpriteColor(7);
-				else if(cursorUnit.getSide().equals("Enemy")) cursor.setSpriteColor(448);	
+				else if(cursorUnit.getSide().equals("Player")) cursor.setSpriteColor((Unit.PLAYER_OUTLINE * 4) & 511);
+				else if(cursorUnit.getSide().equals("Enemy")) cursor.setSpriteColor((Unit.ENEMY_OUTLINE * 4) & 511);
+				else if(cursorUnit.getSide().equals("Ally")) cursor.setSpriteColor((Unit.ALLY_OUTLINE * 4) & 511);
+				else if(cursorUnit.getSide().equals("Neutral")) cursor.setSpriteColor((Unit.NEUTRAL_OUTLINE * 4) & 511);
 			}
 		}
 	}

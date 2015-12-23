@@ -34,6 +34,9 @@ public class Unit {
 	private Sprite sprite;
 	private int xOffset = 0;
 	private int yOffset = 0;
+	private int xMov = 0;
+	private int yMov = 0;
+	private boolean moving = false;
 	
 	public Unit(String name, String spriteSheetPath, String motionsFilePath, int motionsStartLine) {
 		this.name = name;
@@ -117,7 +120,33 @@ public class Unit {
 	//TODO: add changing of animations
 	public void update(int clock) {
 		//updates sprite animation or other things which need continuous updating
-		if(sprite.getCurrentAnimation() == null) sprite.changeAnimationTo("Idle", clock);
+		if(xMov != 0) {
+			int xDif = 2;
+			if(xMov > 0) {
+				xOffset += xDif;
+				xMov -= xDif;
+			}
+			else {
+				xOffset -= xDif;
+				xMov += xDif;
+			}
+		}
+		if(yMov != 0) {
+			int yDif = 2;
+			if(yMov > 0) {
+				yOffset += yDif;
+				yMov -= yDif;
+			}
+			else {
+				yOffset -= yDif;
+				yMov += yDif;
+			}
+		}
+		if(sprite.getCurrentAnimation() == null) sprite.changeAnimationTo("Idle");
+		if(xMov == 0 && yMov == 0) {
+			if(!moving && sprite.getCurrentAnimation().equals("Walking")) sprite.changeAnimationTo("Idle");
+			moving = false;
+		}
 		sprite.update(clock);
 	}
 	
@@ -174,5 +203,29 @@ public class Unit {
 	
 	public Sprite getSprite() {
 		return sprite;
+	}
+	
+	public void setXOffset(int xOffset) {
+		this.xOffset = xOffset;
+	}
+	
+	public void setYOffset(int yOffset) {
+		this.yOffset = yOffset;
+	}
+	
+	public void setXMov(int xMov) {
+		this.xMov = xMov;
+	}
+	
+	public void setYMov(int yMov) {
+		this.yMov = yMov;
+	}
+	
+	public boolean isMoving() {
+		return moving;
+	}
+	
+	public void setMoving(boolean moving) {
+		this.moving = moving;
 	}
 }

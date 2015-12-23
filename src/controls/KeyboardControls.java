@@ -2,13 +2,18 @@ package controls;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.HashMap;
+import java.util.Map;
 
-public class KeyboardControls implements KeyListener{
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 
-	public boolean upPressed = false;
-	public boolean leftPressed = false;
-	public boolean rightPressed = false;
-	public boolean downPressed = false;
+public class KeyboardControls implements KeyListener {
+
+	private Map<Integer, Boolean> keys = new HashMap();
+	public int up = KeyEvent.VK_W;
+	public int left = KeyEvent.VK_A;
+	public int down = KeyEvent.VK_S;
+	public int right = KeyEvent.VK_D;
 	
 	public void keyPressed(KeyEvent arg0) {
 		setKey(arg0, true);
@@ -22,10 +27,11 @@ public class KeyboardControls implements KeyListener{
 		
 	}
 	
-	public void setKey(KeyEvent arg0, boolean pressed) {
-		if(arg0.getKeyCode() == KeyEvent.VK_UP) upPressed = pressed;
-		else if(arg0.getKeyCode() == KeyEvent.VK_LEFT) leftPressed = pressed;
-		else if(arg0.getKeyCode() == KeyEvent.VK_RIGHT) rightPressed = pressed;
-		else if(arg0.getKeyCode() == KeyEvent.VK_DOWN) downPressed = pressed;
+	private void setKey(KeyEvent arg0, boolean pressed) {
+		keys.put(arg0.getKeyCode(), pressed);
+	}
+	
+	public boolean getKey(int keyCode) {
+		return keys.getOrDefault(keyCode, false);
 	}
 }

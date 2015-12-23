@@ -12,10 +12,12 @@ public class Cursor implements MouseListener {
 	private int spriteColor = 0;
 	public int x;
 	public int y;
+	public boolean leftPressed = false;
+	public boolean rightPressed = false;
 	
 	public Cursor() {
-		cursorSprite = new Sprite("/UserInterface.png", "/TestMotions.txt", 8);
-		cursorSprite.changeAnimationTo("Blink", 0);
+		cursorSprite = new Sprite("/UserInterface.png", "/TestMotions.txt", 9);
+		cursorSprite.changeAnimationTo("Blink");
 	}
 	
 	public void update(int clock, Screen screen, int mouseX, int mouseY, int scale) {
@@ -47,11 +49,13 @@ public class Cursor implements MouseListener {
 	}
 
 	public void mousePressed(MouseEvent arg0) {
-		
+		if(arg0.getButton() == MouseEvent.BUTTON1) leftPressed = true;
+		if(arg0.getButton() == MouseEvent.BUTTON3) rightPressed = true;
 	}
 
 	public void mouseReleased(MouseEvent arg0) {
-		
+		if(arg0.getButton() == MouseEvent.BUTTON1) leftPressed = false;
+		if(arg0.getButton() == MouseEvent.BUTTON3) rightPressed = false;
 	}
 	
 	public void setSpriteColor(int color) {

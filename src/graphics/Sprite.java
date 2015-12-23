@@ -17,7 +17,6 @@ public class Sprite {
 	private int animationLength;
 	private String currentAnimation;
 	private int currentFrame = 0;
-	private int animationStartTime = -1;
 	private int x;
 	private int y;
 	private int colorToSwap = Screen.NONCOLOR;
@@ -42,7 +41,6 @@ public class Sprite {
 		//sets scanner to correct line
 		for(int i = 1; i < motionsStartLine; i++) scanner.nextLine();
 		String lineStart = scanner.next();
-		System.out.println(lineStart);
 		while(!lineStart.equals("End")) {
 			Map<Integer, Integer> anim = new HashMap<Integer, Integer>();
 			String nextDataPiece = scanner.next();
@@ -56,11 +54,10 @@ public class Sprite {
 			lineStart = scanner.next();
 		}
 		scanner.close();
-		System.out.println(animations);
 	}
 	
 	public void update(int clock) {
-		int animationTime = (clock - animationStartTime) % animationLength;
+		int animationTime = clock % animationLength;
 		Set<Integer> times = animations.get(currentAnimation).keySet();
 		//time for the frame we are on
 		int frameKey = 0;
@@ -95,9 +92,8 @@ public class Sprite {
 		this.y = y;
 	}
 	
-	public void changeAnimationTo(String newAnimation, int clock) {
+	public void changeAnimationTo(String newAnimation) {
 		currentAnimation = newAnimation;
-		animationStartTime = clock;
 		animationLength = animations.get(currentAnimation).get(-1);
 	}
 	
