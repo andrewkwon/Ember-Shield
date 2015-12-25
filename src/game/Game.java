@@ -24,6 +24,7 @@ import controls.Cursor;
 import controls.KeyboardControls;
 
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
@@ -176,8 +177,6 @@ public class Game extends Canvas implements Runnable {
 				System.out.printf("tps: %d, fps: %d\n", tickCount, frameCount);
 				tickCount = 0;
 				frameCount = 0;
-				int[] directions = {3, 1, 3, 0, 0, 0, 1, 0, 3, 3, 2, 2, 2, 1};
-				b.moveUnitAlongPath(0, 0, directions);
 			}
 			
 			/*display(b);
@@ -211,6 +210,69 @@ public class Game extends Canvas implements Runnable {
 				else if(cursorUnit.getSide().equals("Enemy")) cursor.setSpriteColor((Unit.ENEMY_OUTLINE * 4) & 511);
 				else if(cursorUnit.getSide().equals("Ally")) cursor.setSpriteColor((Unit.ALLY_OUTLINE * 4) & 511);
 				else if(cursorUnit.getSide().equals("Neutral")) cursor.setSpriteColor((Unit.NEUTRAL_OUTLINE * 4) & 511);
+			}
+		}
+		int loggedSelectX = cursor.selectX;
+		int loggedSelectY = cursor.selectY;
+		int loggedSelectType = cursor.selectType;
+		if(kc.getKey(kc.move) && loggedSelectX != -1 && loggedSelectY != -1) {
+			if(b.getUnits()[loggedSelectY][loggedSelectX] != null && loggedSelectType == MouseEvent.BUTTON1) {
+				class SelectionChangeMover extends Thread {
+					
+					public void run() {
+						int newSelectX = cursor.selectX;
+						int newSelectY = cursor.selectY;
+						while(loggedSelectX == newSelectX && loggedSelectY == newSelectY) {
+							Thread.yield();
+						}
+						if(newSelectX != -1 && newSelectY != -1) {
+							int xDif = newSelectX - loggedSelectX;
+							int yDif = newSelectY - loggedSelectY;
+							int dirLength = 0;
+							if(xDif >= 0) dirLength += xDif;
+							else dirLength += xDif * -1;
+							if(yDif >= 0) dirLength += yDif;
+							else dirLength += yDif * -1;
+							int[] directions = new int[dirLength];
+							int xDir = -1;
+							if(xDif > 0) xDir = 0;
+							else if(xDif < 0) xDir = 2;
+							int yDir = -1;
+							if(yDif > 0) yDir = 3;
+							else if(yDif < 0) yDir = 1;
+							for(int i = 0; i < dirLength; i++) {
+								if(xDif > 0 && i < xDif) directions[i] = xDir;
+								else if(xDif < 0 && i < xDif * -1) directions[i] = xDir;
+								else directions[i] = yDir;
+							}
+							System.out.println(loggedSelectX + " " + loggedSelectY + " " + directions.toString());
+							b.moveUnitAlongPath(loggedSelectY, loggedSelectX, directions);
+						}
+					}
+				};
+				SelectionChangeMover scl = new SelectionChangeMover();
+				scl.start();
+			}
+		}
+		else if(kc.getKey(kc.actzero) && loggedSelectX != -1 && loggedSelectY != -1) {
+			if(b.getUnits()[loggedSelectY][loggedSelectX] != null && loggedSelectType == MouseEvent.BUTTON1) {
+				class SelectionChangeActor extends Thread {
+					
+					public void run() {
+						int newSelectX = cursor.selectX;
+						int newSelectY = cursor.selectY;
+						while(loggedSelectX == newSelectX && loggedSelectY == newSelectY) {
+							Thread.yield();
+						}
+						if(newSelectX != -1 && newSelectY != -1) {
+							if(b.getUnits()[newSelectY][newSelectX] != null) {
+								b.getUnits()[loggedSelectY][loggedSelectX].getUnitClass().actZero(b.getUnits()[loggedSelectY][loggedSelectX], b.getUnits()[newSelectY][newSelectX], b);
+							}
+						}
+					}
+				};
+				SelectionChangeActor scl = new SelectionChangeActor();
+				scl.start();
 			}
 		}
 	}

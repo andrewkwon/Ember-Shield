@@ -49,10 +49,11 @@ public class Board {
 		return boardHeight;
 	}
 	
-	//moves unit one space
+	//moves unit one space, returns change in x and y
 	public int[] moveUnit(int row, int column, int direction) {
 		if(units[row][column] == null) return null;
 		//direction: 0=right, 1=up, 2=left, 3=down
+		units[row][column].setFacing(direction);
 		int xDir = 0;
 		int yDir = 0;
 		if(direction % 4 == 0) xDir = 1;
@@ -67,7 +68,9 @@ public class Board {
 			units[row][column].setMoving(true);
 			units[row][column].setXMov(xDir * SpriteSheet.TILE_WIDTH);
 			units[row][column].setYMov(yDir * SpriteSheet.TILE_WIDTH);
-			units[row][column].getSprite().changeAnimationTo("Walking");
+			if(direction % 4 == 0 || direction % 4 == 2) units[row][column].getSprite().changeAnimationTo("WalkingRight");
+			if(direction % 4 == 1) units[row][column].getSprite().changeAnimationTo("WalkingUp");
+			if(direction % 4 == 3) units[row][column].getSprite().changeAnimationTo("WalkingDown");
 			units[row][column].setXOffset(-xDir * SpriteSheet.TILE_WIDTH);
 			units[row][column].setYOffset(-yDir * SpriteSheet.TILE_WIDTH);
 			units[row + yDir][column + xDir] = units[row][column];

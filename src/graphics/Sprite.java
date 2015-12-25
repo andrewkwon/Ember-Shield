@@ -71,9 +71,9 @@ public class Sprite {
 		currentFrame = animations.get(currentAnimation).get(frameKey);
 	}
 	
-	public void render(Screen screen, int scale) {
+	public void render(Screen screen, int scale, boolean mirrorX, boolean mirrorY) {
 		screen.setSheet(spriteSheetPath);
-		screen.render(x, y, currentFrame, scale, colorToSwap, swapTargetColor);
+		screen.render(x, y, currentFrame, scale, colorToSwap, swapTargetColor, mirrorX, mirrorY, 1.0);
 	}
 	
 	public int getX() {

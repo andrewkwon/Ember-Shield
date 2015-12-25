@@ -21,20 +21,22 @@ public class Screen {
 		pixels = new int[width * height];
 	}
 	
-	public void render(int x, int y, int tile, int scale, int color, int targetColor) {
+	public void render(int x, int y, int tile, int scale, int color, int targetColor, boolean mirrorX, boolean mirrorY, double shadeFactor) {
 		int tileX = tile % (sheet.getWidth() / SpriteSheet.TILE_WIDTH);
 		int tileY = (int) tile / (sheet.getWidth() / SpriteSheet.TILE_WIDTH);
 		for(int pixelX = 0; pixelX < SpriteSheet.TILE_WIDTH * scale; pixelX++) {
 			int actualX = pixelX + x * scale  + xOffset;
+			if(mirrorX) actualX += (SpriteSheet.TILE_WIDTH * scale - 2 * pixelX - 1);
 			if(0 <= actualX && actualX < width) {
 				for(int pixelY = 0; pixelY < SpriteSheet.TILE_WIDTH * scale; pixelY++) {
 					int actualY = pixelY + y * scale + yOffset;
+					if(mirrorY) actualY += (SpriteSheet.TILE_WIDTH * scale - 2 * pixelY - 1);
 					if(0 <= actualY && actualY < height) {
 						int pixelData = sheet.getPixels()[tileX * SpriteSheet.TILE_WIDTH + (pixelX / scale) + (tileY * SpriteSheet.TILE_WIDTH + (pixelY / scale)) * sheet.getWidth()];
 						if(pixelData == color) pixelData = targetColor;
 						if(pixelData != SpriteSheet.TRANSPARENT_COLOR){
 							pixels[actualX + actualY * width] = 
-									pixelData;
+									(int) (pixelData * shadeFactor) & 511;
 						}
 					}
 				}

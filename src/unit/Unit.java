@@ -37,6 +37,7 @@ public class Unit {
 	private int xMov = 0;
 	private int yMov = 0;
 	private boolean moving = false;
+	private int facing = 0;
 	
 	public Unit(String name, String spriteSheetPath, String motionsFilePath, int motionsStartLine) {
 		this.name = name;
@@ -144,7 +145,7 @@ public class Unit {
 		}
 		if(sprite.getCurrentAnimation() == null) sprite.changeAnimationTo("Idle");
 		if(xMov == 0 && yMov == 0) {
-			if(!moving && sprite.getCurrentAnimation().equals("Walking")) sprite.changeAnimationTo("Idle");
+			if(!moving && sprite.getCurrentAnimation().contains("Walking")) sprite.changeAnimationTo("Idle");
 			moving = false;
 		}
 		sprite.update(clock);
@@ -153,7 +154,12 @@ public class Unit {
 	public void render(Screen screen, int scale, int x, int y) {
 		sprite.setX(x + xOffset);
 		sprite.setY(y + yOffset);
-		sprite.render(screen, scale);
+		boolean xMirror = false;
+		if(facing % 4 == 0) xMirror = false;
+		else if(facing % 4 == 1) sprite.changeAnimationTo("WalkingUp");
+		else if(facing % 4 == 2) xMirror = true;
+		else if(facing % 4 == 3) sprite.changeAnimationTo("WalkingDown");
+		sprite.render(screen, scale, xMirror, false);
 	}
 	
 	public UnitClass getUnitClass() {
@@ -227,5 +233,9 @@ public class Unit {
 	
 	public void setMoving(boolean moving) {
 		this.moving = moving;
+	}
+	
+	public void setFacing(int facing) {
+		this.facing = facing;
 	}
 }
