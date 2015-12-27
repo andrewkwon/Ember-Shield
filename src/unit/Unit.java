@@ -38,6 +38,8 @@ public class Unit {
 	private int yMov = 0;
 	private boolean moving = false;
 	private int facing = 0;
+	private int[] directions;
+	private int directionsIndex;
 	
 	public Unit(String name, String spriteSheetPath, String motionsFilePath, int motionsStartLine) {
 		this.name = name;
@@ -118,8 +120,7 @@ public class Unit {
 		board.removeUnit(this);
 	}
 	
-	//TODO: add changing of animations
-	public void update(int clock) {
+	public void update(int clock, Board board, int row, int column) {
 		//updates sprite animation or other things which need continuous updating
 		if(xMov != 0) {
 			int xDif = 2;
@@ -147,6 +148,19 @@ public class Unit {
 		if(xMov == 0 && yMov == 0) {
 			if(!moving && sprite.getCurrentAnimation().contains("Walking")) sprite.changeAnimationTo("Idle");
 			moving = false;
+		}
+		if(directions != null && moving == false) {
+			if(board.moveUnit(row, column, directions[directionsIndex])) {
+				directionsIndex++;
+				if(directionsIndex >= directions.length) {
+					directionsIndex = -1;
+					directions = null;
+				}
+			}
+			else {
+				directionsIndex = -1;
+				directions = null;
+			}
 		}
 		sprite.update(clock);
 	}
@@ -237,5 +251,14 @@ public class Unit {
 	
 	public void setFacing(int facing) {
 		this.facing = facing;
+	}
+	
+	public void setDirections(int[] directions) {
+		this.directions = directions;
+		if(directions != null) directionsIndex = 0;
+	}
+	
+	public void setEquipped(int equipped) {
+		this.equipped = equipped;
 	}
 }

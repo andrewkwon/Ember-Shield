@@ -50,8 +50,8 @@ public class Board {
 	}
 	
 	//moves unit one space, returns change in x and y
-	public int[] moveUnit(int row, int column, int direction) {
-		if(units[row][column] == null) return null;
+	public boolean moveUnit(int row, int column, int direction) {
+		if(units[row][column] == null) return false;
 		//direction: 0=right, 1=up, 2=left, 3=down
 		units[row][column].setFacing(direction);
 		int xDir = 0;
@@ -60,10 +60,9 @@ public class Board {
 		else if(direction % 4 == 1) yDir = -1;
 		else if(direction % 4 == 2) xDir = -1;
 		else if(direction % 4 == 3) yDir = 1;
-		int[] dir = {xDir, yDir};
 		if(row + yDir < 0 || row + yDir >= boardHeight ||
 				column + xDir < 0 || column + xDir >= boardWidth ||
-				units[row + yDir][column + xDir] != null) return null;
+				units[row + yDir][column + xDir] != null) return false;
 		else {
 			units[row][column].setMoving(true);
 			units[row][column].setXMov(xDir * SpriteSheet.TILE_WIDTH);
@@ -75,45 +74,19 @@ public class Board {
 			units[row][column].setYOffset(-yDir * SpriteSheet.TILE_WIDTH);
 			units[row + yDir][column + xDir] = units[row][column];
 			units[row][column] = null;
-			return dir;
+			return true;
 		}
 	}
 	
 	public void moveUnitAlongPath(int row, int column, int[] directions) {
-		
-		class moverThread extends Thread{
-			
-			public void run() {
-				move();
-			}
-			
-			public boolean move() {
-				if(units[row][column] == null) return false;
-				int currentRow = row;
-				int currentColumn = column;
-				for(int i = 0; i < directions.length; i++) {
-					while(units[currentRow][currentColumn].isMoving()) Thread.yield();
-					int[] dir = moveUnit(currentRow, currentColumn, directions[i]);
-					if(dir == null) {
-						return false;
-					}
-					else {
-						currentRow += dir[1];
-						currentColumn += dir[0];
-					}
-				}
-				return true;
-			}
-		}
-		Thread mover = new moverThread();
-		mover.start();
+		units[row][column].setDirections(directions);
 	}
 	
 	public void update(int clock) {
 		for(int row = 0; row < boardHeight; row++) {
 			for(int column = 0; column < boardWidth; column++) {
 				if(units[row][column] != null) {
-					units[row][column].update(clock);
+					units[row][column].update(clock, this, row, column);
 				}
 			}
 		}

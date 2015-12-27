@@ -59,6 +59,9 @@ public class Game extends Canvas implements Runnable {
 	private String objective = "DefeatAll";
 	private boolean currentlyUpdating = false;
 	private boolean currentlyRendering = false;
+	private int loggedSelectX = -1;
+	private int loggedSelectY = -1;
+	private int loggedSelectType = -1;
 	
 	public Game() {
 		super();
@@ -212,69 +215,49 @@ public class Game extends Canvas implements Runnable {
 				else if(cursorUnit.getSide().equals("Neutral")) cursor.setSpriteColor((Unit.NEUTRAL_OUTLINE * 4) & 511);
 			}
 		}
-		int loggedSelectX = cursor.selectX;
-		int loggedSelectY = cursor.selectY;
-		int loggedSelectType = cursor.selectType;
-		if(kc.getKey(kc.move) && loggedSelectX != -1 && loggedSelectY != -1) {
-			if(b.getUnits()[loggedSelectY][loggedSelectX] != null && loggedSelectType == MouseEvent.BUTTON1) {
-				class SelectionChangeMover extends Thread {
-					
-					public void run() {
-						int newSelectX = cursor.selectX;
-						int newSelectY = cursor.selectY;
-						while(loggedSelectX == newSelectX && loggedSelectY == newSelectY) {
-							Thread.yield();
-						}
-						if(newSelectX != -1 && newSelectY != -1) {
-							int xDif = newSelectX - loggedSelectX;
-							int yDif = newSelectY - loggedSelectY;
-							int dirLength = 0;
-							if(xDif >= 0) dirLength += xDif;
-							else dirLength += xDif * -1;
-							if(yDif >= 0) dirLength += yDif;
-							else dirLength += yDif * -1;
-							int[] directions = new int[dirLength];
-							int xDir = -1;
-							if(xDif > 0) xDir = 0;
-							else if(xDif < 0) xDir = 2;
-							int yDir = -1;
-							if(yDif > 0) yDir = 3;
-							else if(yDif < 0) yDir = 1;
-							for(int i = 0; i < dirLength; i++) {
-								if(xDif > 0 && i < xDif) directions[i] = xDir;
-								else if(xDif < 0 && i < xDif * -1) directions[i] = xDir;
-								else directions[i] = yDir;
-							}
-							System.out.println(loggedSelectX + " " + loggedSelectY + " " + directions.toString());
-							b.moveUnitAlongPath(loggedSelectY, loggedSelectX, directions);
-						}
+		
+		if(loggedSelectType == MouseEvent.BUTTON1 && loggedSelectX != -1 && loggedSelectY != -1 && b.getUnits()[loggedSelectY][loggedSelectX] != null) {
+			if(kc.getKey(kc.move)) {
+				int newSelectX = cursor.selectX;
+				int newSelectY = cursor.selectY;
+				if(newSelectX != -1 && newSelectY != -1 && !(newSelectX == loggedSelectX && newSelectY == loggedSelectY)) {
+					int xDif = newSelectX - loggedSelectX;
+					int yDif = newSelectY - loggedSelectY;
+					int dirLength = 0;
+					if(xDif >= 0) dirLength += xDif;
+					else dirLength += xDif * -1;
+					if(yDif >= 0) dirLength += yDif;
+					else dirLength += yDif * -1;
+					int[] directions = new int[dirLength];
+					int xDir = -1;
+					if(xDif > 0) xDir = 0;
+					else if(xDif < 0) xDir = 2;
+					int yDir = -1;
+					if(yDif > 0) yDir = 3;
+					else if(yDif < 0) yDir = 1;
+					for(int i = 0; i < dirLength; i++) {
+						if(xDif > 0 && i < xDif) directions[i] = xDir;
+						else if(xDif < 0 && i < xDif * -1) directions[i] = xDir;
+						else directions[i] = yDir;
 					}
-				};
-				SelectionChangeMover scl = new SelectionChangeMover();
-				scl.start();
+					System.out.println(loggedSelectX + " " + loggedSelectY + " " + directions.toString());
+					b.moveUnitAlongPath(loggedSelectY, loggedSelectX, directions);
+				}
+			}
+			else if(kc.getKey(kc.actzero)) {
+				int newSelectX = cursor.selectX;
+				int newSelectY = cursor.selectY;
+				if(newSelectX != -1 && newSelectY != -1 && !(newSelectX == loggedSelectX && newSelectY == loggedSelectY)) {
+					if(b.getUnits()[newSelectY][newSelectX] != null) {
+						b.getUnits()[loggedSelectY][loggedSelectX].getUnitClass().actZero(b.getUnits()[loggedSelectY][loggedSelectX], b.getUnits()[newSelectY][newSelectX], b);
+					}
+				}
 			}
 		}
-		else if(kc.getKey(kc.actzero) && loggedSelectX != -1 && loggedSelectY != -1) {
-			if(b.getUnits()[loggedSelectY][loggedSelectX] != null && loggedSelectType == MouseEvent.BUTTON1) {
-				class SelectionChangeActor extends Thread {
-					
-					public void run() {
-						int newSelectX = cursor.selectX;
-						int newSelectY = cursor.selectY;
-						while(loggedSelectX == newSelectX && loggedSelectY == newSelectY) {
-							Thread.yield();
-						}
-						if(newSelectX != -1 && newSelectY != -1) {
-							if(b.getUnits()[newSelectY][newSelectX] != null) {
-								b.getUnits()[loggedSelectY][loggedSelectX].getUnitClass().actZero(b.getUnits()[loggedSelectY][loggedSelectX], b.getUnits()[newSelectY][newSelectX], b);
-							}
-						}
-					}
-				};
-				SelectionChangeActor scl = new SelectionChangeActor();
-				scl.start();
-			}
-		}
+
+		loggedSelectX = cursor.selectX;
+		loggedSelectY = cursor.selectY;
+		loggedSelectType = cursor.selectType;
 	}
 	
 	public void render() {

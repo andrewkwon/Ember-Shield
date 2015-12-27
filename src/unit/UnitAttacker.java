@@ -25,7 +25,10 @@ public class UnitAttacker extends UnitClass {
 			else damage += unitA.getStat("Mag");
 			System.out.printf("%s attacks %s! \n", unitA.getName(), unitB.getName());
 			unitB.takeDamage(physicalDamage, damage, board);
-			if(!unitA.getItem(unitA.getEquipped()).wear()) unitA.removeItem(unitA.getEquipped());
+			if(!unitA.getItem(unitA.getEquipped()).wear()) {
+				unitA.removeItem(unitA.getEquipped());
+				unitA.setEquipped(-1);
+			}
 			return true;
 		}
 		return false;
