@@ -21,6 +21,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import controls.Cursor;
+import controls.DirectingArrow;
 import controls.KeyboardControls;
 
 import java.awt.Dimension;
@@ -62,6 +63,7 @@ public class Game extends Canvas implements Runnable {
 	private int loggedSelectX = -1;
 	private int loggedSelectY = -1;
 	private int loggedSelectType = -1;
+	private DirectingArrow directingArrow;
 	
 	public Game() {
 		super();
@@ -87,6 +89,7 @@ public class Game extends Canvas implements Runnable {
 		frame.setVisible(true);
 		addKeyListener(kc = new KeyboardControls());
 		addMouseListener(cursor = new Cursor());
+		directingArrow = new DirectingArrow();
 	}
 	
 	public synchronized void init() {
@@ -203,11 +206,15 @@ public class Game extends Canvas implements Runnable {
 		for(int i = 0; i < scale && kc.getKey(kc.down) && screen.yOffset > height - b.getBoardHeight() * SpriteSheet.TILE_WIDTH * scale; i++) screen.yOffset--;
 		b.update(clock);
 		Point point = getMousePosition();
+		int cursorX = -1;
+		int cursorY = -1;
 		if(point != null) { 
 			cursor.update(clock, screen, point.x, point.y, scale);
-			if(cursor.x / SpriteSheet.TILE_WIDTH >= 0 && cursor.x / SpriteSheet.TILE_WIDTH < b.getBoardWidth() &&
-				cursor.y / SpriteSheet.TILE_WIDTH >= 0 && cursor.y / SpriteSheet.TILE_WIDTH < b.getBoardHeight()) {
-				Unit cursorUnit = b.getUnits()[cursor.y / SpriteSheet.TILE_WIDTH][cursor.x / SpriteSheet.TILE_WIDTH];
+			cursorX = cursor.x;
+			cursorY = cursor.y;
+			if(cursorX / SpriteSheet.TILE_WIDTH >= 0 && cursorX / SpriteSheet.TILE_WIDTH < b.getBoardWidth() &&
+				cursorY / SpriteSheet.TILE_WIDTH >= 0 && cursorY / SpriteSheet.TILE_WIDTH < b.getBoardHeight()) {
+				Unit cursorUnit = b.getUnits()[cursorY / SpriteSheet.TILE_WIDTH][cursorX / SpriteSheet.TILE_WIDTH];
 				if(cursorUnit == null) cursor.setSpriteColor(0);
 				else if(cursorUnit.getSide().equals("Player")) cursor.setSpriteColor((Unit.PLAYER_OUTLINE * 4) & 511);
 				else if(cursorUnit.getSide().equals("Enemy")) cursor.setSpriteColor((Unit.ENEMY_OUTLINE * 4) & 511);
@@ -220,28 +227,14 @@ public class Game extends Canvas implements Runnable {
 			if(kc.getKey(kc.move)) {
 				int newSelectX = cursor.selectX;
 				int newSelectY = cursor.selectY;
+				if(directingArrow.getHeadX() == -1 || directingArrow.getHeadY() == -1) {
+					directingArrow.setHeadX(loggedSelectX);
+					directingArrow.setHeadY(loggedSelectY);
+					if(!directingArrow.getSettingDirections()) directingArrow.setSettingDirections(true);
+				}
+				directingArrow.update(clock, cursorX / SpriteSheet.TILE_WIDTH, cursorY / SpriteSheet.TILE_WIDTH);
 				if(newSelectX != -1 && newSelectY != -1 && !(newSelectX == loggedSelectX && newSelectY == loggedSelectY)) {
-					int xDif = newSelectX - loggedSelectX;
-					int yDif = newSelectY - loggedSelectY;
-					int dirLength = 0;
-					if(xDif >= 0) dirLength += xDif;
-					else dirLength += xDif * -1;
-					if(yDif >= 0) dirLength += yDif;
-					else dirLength += yDif * -1;
-					int[] directions = new int[dirLength];
-					int xDir = -1;
-					if(xDif > 0) xDir = 0;
-					else if(xDif < 0) xDir = 2;
-					int yDir = -1;
-					if(yDif > 0) yDir = 3;
-					else if(yDif < 0) yDir = 1;
-					for(int i = 0; i < dirLength; i++) {
-						if(xDif > 0 && i < xDif) directions[i] = xDir;
-						else if(xDif < 0 && i < xDif * -1) directions[i] = xDir;
-						else directions[i] = yDir;
-					}
-					System.out.println(loggedSelectX + " " + loggedSelectY + " " + directions.toString());
-					b.moveUnitAlongPath(loggedSelectY, loggedSelectX, directions);
+					b.moveUnitAlongPath(loggedSelectY, loggedSelectX, directingArrow.readDirections());
 				}
 			}
 			else if(kc.getKey(kc.actzero)) {
@@ -270,6 +263,7 @@ public class Game extends Canvas implements Runnable {
 		
 		b.render(screen, scale);
 		cursor.render(screen, scale);
+		directingArrow.render(screen, scale);
 		
 		for(int i = 0; i < pixels.length; i++) {
 			if (screen.getPixels()[i] != -1) {

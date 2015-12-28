@@ -13,3 +13,8 @@ End
 Select:
 Spin -1 15 0 3 5 4 10 5 End
 End
+Directing Arrow:
+Dot -1 60 0 6 End
+RightArrow -1 60 0 7 End
+UpArrow -1 60 0 8 End
+End
