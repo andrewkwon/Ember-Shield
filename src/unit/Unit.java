@@ -6,6 +6,7 @@ import board.Board;
 
 import java.util.HashMap;
 
+import graphics.OnScreenText;
 import graphics.Screen;
 import graphics.Sprite;
 import graphics.SpriteSheet;
@@ -40,6 +41,8 @@ public class Unit {
 	private int facing = 0;
 	private int[] directions;
 	private int directionsIndex;
+	private OnScreenText damageNumbers;
+	private boolean takingDamage = false;
 	
 	public Unit(String name, String spriteSheetPath, String motionsFilePath, int motionsStartLine) {
 		this.name = name;
@@ -107,6 +110,9 @@ public class Unit {
 		if(physicalDamage) defense = stats.get("Def");
 		else defense = stats.get("Res");
 		int damageSustained = damage - defense;
+		takingDamage = true;
+		damageNumbers = new OnScreenText(-1, -1, Integer.toString(damageSustained), 448);
+		damageNumbers.setYMov(-SpriteSheet.TILE_WIDTH);
 		if(damageSustained < 0) damageSustained = 0;
 		int newHP = stats.get("HP") - damageSustained;
 		if(newHP < 0) newHP = 0;
@@ -147,6 +153,7 @@ public class Unit {
 		if(sprite.getCurrentAnimation() == null) sprite.changeAnimationTo("Idle");
 		if(xMov == 0 && yMov == 0) {
 			if(!moving && sprite.getCurrentAnimation().contains("Walking")) sprite.changeAnimationTo("Idle");
+			if(directions == null && moving) canMove = false;
 			moving = false;
 		}
 		if(directions != null && moving == false) {
@@ -163,6 +170,7 @@ public class Unit {
 			}
 		}
 		sprite.update(clock);
+		if(damageNumbers != null) damageNumbers.update();
 	}
 	
 	public void render(Screen screen, int scale, int x, int y) {
@@ -173,7 +181,16 @@ public class Unit {
 		else if(facing % 4 == 1) sprite.changeAnimationTo("WalkingUp");
 		else if(facing % 4 == 2) xMirror = true;
 		else if(facing % 4 == 3) sprite.changeAnimationTo("WalkingDown");
+		if(!active) sprite.setShadeFactor(0.5);
 		sprite.render(screen, scale, xMirror, false);
+		if(damageNumbers != null) {
+			if(takingDamage) {
+				damageNumbers.setX((x + xOffset) * scale);
+				damageNumbers.setY((y + yOffset) * scale);
+				takingDamage = false;
+			}
+			damageNumbers.render(screen);
+		}
 	}
 	
 	public UnitClass getUnitClass() {
@@ -260,5 +277,13 @@ public class Unit {
 	
 	public void setEquipped(int equipped) {
 		this.equipped = equipped;
+	}
+	
+	public boolean getCanMove() {
+		return canMove;
+	}
+	
+	public void setCanMove(boolean canMove) {
+		this.canMove = canMove;
 	}
 }

@@ -79,6 +79,7 @@ public class Board {
 	}
 	
 	public void moveUnitAlongPath(int row, int column, int[] directions) {
+		if(!units[row][column].getCanMove()) return;
 		units[row][column].setDirections(directions);
 	}
 	

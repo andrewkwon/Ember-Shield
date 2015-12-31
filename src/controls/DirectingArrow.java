@@ -6,8 +6,11 @@ import graphics.SpriteSheet;
 
 import java.util.ArrayList;
 
+import unit.Unit;
+
 public class DirectingArrow {
 
+	private Unit selectedUnit;
 	private int headX = -1;
 	private int headY = -1;
 	private ArrayList<Integer> directions = new ArrayList<Integer>();
@@ -19,39 +22,47 @@ public class DirectingArrow {
 	}
 	
 	public void update(int clock, int cursorX, int cursorY) {
-		if(settingDirections) {
+		if(settingDirections && selectedUnit != null && selectedUnit.getCanMove()) {
 			int xDif = cursorX - headX;
 			int yDif = cursorY - headY;
 			if(!(xDif == 0 && yDif == 0)) {
 				int dir = -1;
 				while(xDif != 0 || yDif != 0) {
+					int headXChange = 0;
+					int headYChange = 0;
 					if(xDif > 0) {
 						dir = 0;
 						xDif--;
+						headXChange++;
 					}
 					else if(yDif < 0) {
 						dir = 1;
 						yDif++;
+						headYChange--;
 					}
 					else if(xDif < 0) {
 						dir = 2;
 						xDif++;
+						headXChange--;
 					}
 					else if(yDif > 0) {
 						dir = 3;
 						yDif--;
+						headYChange++;
 					}
 					if(!directions.isEmpty() && directions.get(directions.size() - 1) == (dir + 2) % 4) {
 						directions.remove(directions.size() - 1);
+						headX += headXChange;
+						headY += headYChange;
 					}
 					else {
-						directions.add(dir);
+						if(directions.size() < selectedUnit.getStat("Move")) {
+							directions.add(dir);
+							headX += headXChange;
+							headY += headYChange;
+						}
 					}
-					
 				}
-				headX = cursorX;
-				headY = cursorY;
-				
 				while(sprites.size() < directions.size()) {
 					sprites.add(new Sprite("/UserInterface.png", "/TestMotions.txt", 17));
 				}
@@ -69,7 +80,6 @@ public class DirectingArrow {
 						else sprites.get(i).changeAnimationTo("UpArrow");
 					}
 					else sprites.get(i).changeAnimationTo("Dot");
-					System.out.println(i + ": " + sprites.get(i).getCurrentAnimation());
 					sprites.get(i).setX(spriteX * SpriteSheet.TILE_WIDTH);
 					sprites.get(i).setY(spriteY * SpriteSheet.TILE_WIDTH);
 					sprites.get(i).update(clock);
@@ -87,7 +97,7 @@ public class DirectingArrow {
 	}
 	
 	public void render(Screen screen, int scale) {
-		if(settingDirections) {
+		if(settingDirections && selectedUnit != null && selectedUnit.getCanMove()) {
 			for(int i = sprites.size() - 1; i >= 0; i--) {
 				boolean mirrorX = false;
 				boolean mirrorY = false;
@@ -118,14 +128,14 @@ public class DirectingArrow {
 	}
 	
 	public int[] readDirections() {
-		settingDirections = false;
 		int[] reading = new int[directions.size()];
 		for(int i = 0; i < reading.length; i++) reading[i] = directions.get(i);
-		directions.clear();
-		sprites.clear();
-		headX = -1;
-		headY = -1;
+		clear();
 		return reading;
+	}
+	
+	public void setSelectedUnit(Unit selectedUnit) {
+		this.selectedUnit = selectedUnit;
 	}
 	
 	public boolean getSettingDirections() {
@@ -134,5 +144,13 @@ public class DirectingArrow {
 	
 	public void setSettingDirections(boolean settingDirections) {
 		this.settingDirections = settingDirections;
+	}
+	
+	public void clear() {
+		settingDirections = false;
+		directions.clear();
+		sprites.clear();
+		headX = -1;
+		headY = -1;
 	}
 }

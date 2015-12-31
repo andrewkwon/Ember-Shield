@@ -1,5 +1,6 @@
 package game;
 import unit.Unit;
+import graphics.OnScreenText;
 import graphics.Screen;
 import graphics.SpriteSheet;
 import item.Item;
@@ -128,11 +129,13 @@ public class Game extends Canvas implements Runnable {
 		fred.getUnitClass().setEquippableItemTypes(types);
 		fred.setStat("HP", 2);
 		fred.setStat("Str", 1);
-		fred.setSide("Ally");
+		fred.setStat("Move", 4);
+		fred.setSide("Player");
 		bob.setUnitClass(new UnitClass("freddy"));
 		bob.setStat("HP", 2);
 		bob.setStat("Str", 1);
-		bob.setSide("Neutral");
+		bob.setStat("Move", 2);
+		bob.setSide("Enemy");
 		
 		Weapon fredinator = new Weapon("Fredinator");
 		fredinator.setUsable(true);
@@ -228,6 +231,7 @@ public class Game extends Canvas implements Runnable {
 				int newSelectX = cursor.selectX;
 				int newSelectY = cursor.selectY;
 				if(directingArrow.getHeadX() == -1 || directingArrow.getHeadY() == -1) {
+					directingArrow.setSelectedUnit(b.getUnits()[loggedSelectY][loggedSelectX]);
 					directingArrow.setHeadX(loggedSelectX);
 					directingArrow.setHeadY(loggedSelectY);
 					if(!directingArrow.getSettingDirections()) directingArrow.setSettingDirections(true);
@@ -237,12 +241,15 @@ public class Game extends Canvas implements Runnable {
 					b.moveUnitAlongPath(loggedSelectY, loggedSelectX, directingArrow.readDirections());
 				}
 			}
-			else if(kc.getKey(kc.actzero)) {
-				int newSelectX = cursor.selectX;
-				int newSelectY = cursor.selectY;
-				if(newSelectX != -1 && newSelectY != -1 && !(newSelectX == loggedSelectX && newSelectY == loggedSelectY)) {
-					if(b.getUnits()[newSelectY][newSelectX] != null) {
-						b.getUnits()[loggedSelectY][loggedSelectX].getUnitClass().actZero(b.getUnits()[loggedSelectY][loggedSelectX], b.getUnits()[newSelectY][newSelectX], b);
+			else {
+				directingArrow.clear();
+				if(kc.getKey(kc.actzero)) {
+					int newSelectX = cursor.selectX;
+					int newSelectY = cursor.selectY;
+					if(newSelectX != -1 && newSelectY != -1 && !(newSelectX == loggedSelectX && newSelectY == loggedSelectY)) {
+						if(b.getUnits()[newSelectY][newSelectX] != null) {
+							b.getUnits()[loggedSelectY][loggedSelectX].getUnitClass().act(0, b.getUnits()[loggedSelectY][loggedSelectX], b.getUnits()[newSelectY][newSelectX], b);
+						}
 					}
 				}
 			}

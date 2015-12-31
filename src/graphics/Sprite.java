@@ -21,6 +21,7 @@ public class Sprite {
 	private int y;
 	private int colorToSwap = Screen.NONCOLOR;
 	private int swapTargetColor = Screen.NONCOLOR;
+	private double shadeFactor = 1.0;
 	
 	public Sprite(String spriteSheetPath, String motionsFilePath, int motionsStartLine) {
 		this.spriteSheetPath = spriteSheetPath;
@@ -73,7 +74,7 @@ public class Sprite {
 	
 	public void render(Screen screen, int scale, boolean mirrorX, boolean mirrorY) {
 		screen.setSheet(spriteSheetPath);
-		screen.render(x, y, currentFrame, scale, colorToSwap, swapTargetColor, mirrorX, mirrorY, 1.0);
+		screen.render(x, y, currentFrame, scale, colorToSwap, swapTargetColor, mirrorX, mirrorY, shadeFactor);
 	}
 	
 	public int getX() {
@@ -107,5 +108,9 @@ public class Sprite {
 	
 	public void setSwapTargetColor(int swapTargetColor) {
 		this.swapTargetColor = swapTargetColor;
+	}
+	
+	public void setShadeFactor(double shadeFactor) {
+		this.shadeFactor = shadeFactor;
 	}
 }

@@ -24,6 +24,19 @@ public class UnitClass {
 			else if(actionId == 1) actOne(unitA, unitB, board);
 			else if(actionId == 2) actTwo(unitA, unitB, board);
 			else if(actionId == 3) actThree(unitA, unitB, board);
+			unitA.setActive(false);
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean act(int actionId, Unit unitA, Unit unitB, Board board) {
+		if(actions.containsValue(actionId)) {
+			if(actionId == 0) actZero(unitA, unitB, board);
+			else if(actionId == 1) actOne(unitA, unitB, board);
+			else if(actionId == 2) actTwo(unitA, unitB, board);
+			else if(actionId == 3) actThree(unitA, unitB, board);
+			unitA.setActive(false);
 			return true;
 		}
 		return false;

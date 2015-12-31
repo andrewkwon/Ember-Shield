@@ -33,10 +33,16 @@ public class Screen {
 					if(mirrorY) actualY += (SpriteSheet.TILE_WIDTH * scale - 2 * pixelY - 1);
 					if(0 <= actualY && actualY < height) {
 						int pixelData = sheet.getPixels()[tileX * SpriteSheet.TILE_WIDTH + (pixelX / scale) + (tileY * SpriteSheet.TILE_WIDTH + (pixelY / scale)) * sheet.getWidth()];
-						if(pixelData == color) pixelData = targetColor;
 						if(pixelData != SpriteSheet.TRANSPARENT_COLOR){
+							if(shadeFactor != 1) {
+								int r = (int) (((pixelData % (SpriteSheet.COLOR_DEPTH * SpriteSheet.COLOR_DEPTH)) & 7) * shadeFactor);
+								int g = (int) (((pixelData % (SpriteSheet.COLOR_DEPTH)) & 7) * shadeFactor);
+								int b = (int) (((pixelData) & 7) * shadeFactor);
+								pixelData = (r << 6) + (g << 3) + (b);
+							}
+							if(pixelData == color) pixelData = targetColor;
 							pixels[actualX + actualY * width] = 
-									(int) (pixelData * shadeFactor) & 511;
+									pixelData & 511;
 						}
 					}
 				}
