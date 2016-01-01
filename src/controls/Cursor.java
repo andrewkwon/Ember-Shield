@@ -3,8 +3,11 @@ package controls;
 import graphics.Screen;
 import graphics.Sprite;
 import graphics.SpriteSheet;
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
+import unit.Unit;
 
 public class Cursor implements MouseListener {
 	
@@ -18,11 +21,12 @@ public class Cursor implements MouseListener {
 	public int selectY = -1;
 	public int selectType = -1;
 	private Sprite selectSprite;
+	private Unit selectedUnit;
 	
 	public Cursor() {
-		cursorSprite = new Sprite("/UserInterface.png", "/TestMotions.txt", 11);
+		cursorSprite = new Sprite("/UserInterface.png", "/TestMotions.txt", 12);
 		cursorSprite.changeAnimationTo("Blink");
-		selectSprite = new Sprite("/UserInterface.png", "/TestMotions.txt", 14);
+		selectSprite = new Sprite("/UserInterface.png", "/TestMotions.txt", 15);
 		selectSprite.changeAnimationTo("Spin");
 	}
 	
@@ -86,5 +90,13 @@ public class Cursor implements MouseListener {
 		spriteColor = color;
 		cursorSprite.setColorToSwap(0);
 		cursorSprite.setSwapTargetColor(spriteColor);
+	}
+	
+	public void setSelectedUnit(Unit selectedUnit) {
+		this.selectedUnit = selectedUnit;
+	}
+	
+	public Unit getSelectedUnit() {
+		return selectedUnit;
 	}
 }

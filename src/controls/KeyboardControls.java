@@ -16,6 +16,7 @@ public class KeyboardControls implements KeyListener {
 	public int right = KeyEvent.VK_D;
 	public int move = KeyEvent.VK_SHIFT;
 	public int actzero = KeyEvent.VK_0;
+	public int turnend = KeyEvent.VK_ENTER;
 	
 	public void keyPressed(KeyEvent arg0) {
 		setKey(arg0, true);

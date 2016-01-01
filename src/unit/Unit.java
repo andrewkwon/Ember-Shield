@@ -43,6 +43,7 @@ public class Unit {
 	private int directionsIndex;
 	private OnScreenText damageNumbers;
 	private boolean takingDamage = false;
+	private boolean dead = false;
 	
 	public Unit(String name, String spriteSheetPath, String motionsFilePath, int motionsStartLine) {
 		this.name = name;
@@ -112,7 +113,7 @@ public class Unit {
 		int damageSustained = damage - defense;
 		takingDamage = true;
 		damageNumbers = new OnScreenText(-1, -1, Integer.toString(damageSustained), 448);
-		damageNumbers.setYMov(-SpriteSheet.TILE_WIDTH);
+		damageNumbers.setYMov((int) (-1.75) * SpriteSheet.TILE_WIDTH);
 		if(damageSustained < 0) damageSustained = 0;
 		int newHP = stats.get("HP") - damageSustained;
 		if(newHP < 0) newHP = 0;
@@ -123,7 +124,13 @@ public class Unit {
 	//if has died, remove from board;
 	public void die(Board board) {
 		System.out.printf("%s died! \n", name);
-		board.removeUnit(this);
+		dead = true;
+		sprite.setCounter(0);
+	}
+	
+	public void refresh() {
+		canMove = true;
+		active = true;
 	}
 	
 	public void update(int clock, Board board, int row, int column) {
@@ -170,7 +177,29 @@ public class Unit {
 			}
 		}
 		sprite.update(clock);
-		if(damageNumbers != null) damageNumbers.update();
+		if(damageNumbers != null) {
+			damageNumbers.update();
+			if(damageNumbers.getXMov() == 0 && damageNumbers.getYMov() == 0) {
+				if(damageNumbers.getCounter() >= 30) {
+					damageNumbers = null;
+					takingDamage = false;
+					sprite.changeAnimationTo("Idle");
+				}
+				else if(damageNumbers.getCounter() % 10 < 5){
+					damageNumbers.setTextColor(511);
+				}
+				else damageNumbers.setTextColor(448);
+			}
+		}
+		if(dead) {
+			if(sprite.getCounter() >= 15) {
+				sprite.setShadeFactor(7.0);
+				int transition = (sprite.getCounter() * 511) / 30;
+				int newColor = transition * SpriteSheet.COLOR_DEPTH * SpriteSheet.COLOR_DEPTH + transition * SpriteSheet.COLOR_DEPTH + transition;
+				sprite.setSwapTargetColor(newColor);
+			}
+			if(sprite.getCounter() >= 30) board.removeUnit(this);
+		}
 	}
 	
 	public void render(Screen screen, int scale, int x, int y) {
@@ -182,12 +211,13 @@ public class Unit {
 		else if(facing % 4 == 2) xMirror = true;
 		else if(facing % 4 == 3) sprite.changeAnimationTo("WalkingDown");
 		if(!active) sprite.setShadeFactor(0.5);
+		if(takingDamage) sprite.changeAnimationTo("TookDamage");
 		sprite.render(screen, scale, xMirror, false);
 		if(damageNumbers != null) {
-			if(takingDamage) {
+			if(takingDamage && damageNumbers.getCounter() == -1) {
 				damageNumbers.setX((x + xOffset) * scale);
 				damageNumbers.setY((y + yOffset) * scale);
-				takingDamage = false;
+				damageNumbers.setCounter(0);
 			}
 			damageNumbers.render(screen);
 		}

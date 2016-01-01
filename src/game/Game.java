@@ -10,6 +10,7 @@ import board.Board;
 import board.Land;
 import unit.UnitAttacker;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -65,6 +66,8 @@ public class Game extends Canvas implements Runnable {
 	private int loggedSelectY = -1;
 	private int loggedSelectType = -1;
 	private DirectingArrow directingArrow;
+	public int turnNumber = 0;
+	public String[] turnOrder;
 	
 	public Game() {
 		super();
@@ -132,7 +135,7 @@ public class Game extends Canvas implements Runnable {
 		fred.setStat("Move", 4);
 		fred.setSide("Player");
 		bob.setUnitClass(new UnitClass("freddy"));
-		bob.setStat("HP", 2);
+		bob.setStat("HP", 1);
 		bob.setStat("Str", 1);
 		bob.setStat("Move", 2);
 		bob.setSide("Enemy");
@@ -146,6 +149,20 @@ public class Game extends Canvas implements Runnable {
 		System.out.println("fred.giveItem(fredinator): " + fred.giveItem(fredinator));
 		System.out.println("fred.equip(0): " + fred.equip(0));
 		System.out.println("fred.getUnitClass() instanceof UnitAttacker: " + (fred.getUnitClass() instanceof UnitAttacker));
+		
+		ArrayList<String> sides = new ArrayList<String>();
+		for(Unit[] row : b.getUnits()) {
+			for(Unit u : row) {
+				if(u != null) {
+					String s = u.getSide();
+					if(!sides.contains(s)) {
+						sides.add(s);
+					}
+				}
+			}
+		}
+		turnOrder = new String[sides.size()];
+		for(int i = 0; i < sides.size(); i++) turnOrder[i] = sides.get(i);
 	}
 	
 	public void run() {
@@ -227,7 +244,7 @@ public class Game extends Canvas implements Runnable {
 		}
 		
 		if(loggedSelectType == MouseEvent.BUTTON1 && loggedSelectX != -1 && loggedSelectY != -1 && b.getUnits()[loggedSelectY][loggedSelectX] != null) {
-			if(kc.getKey(kc.move)) {
+			if(kc.getKey(kc.move) && cursor.getSelectedUnit() != null && cursor.getSelectedUnit().getSide() == turnOrder[turnNumber % turnOrder.length]) {
 				int newSelectX = cursor.selectX;
 				int newSelectY = cursor.selectY;
 				if(directingArrow.getHeadX() == -1 || directingArrow.getHeadY() == -1) {
@@ -243,7 +260,7 @@ public class Game extends Canvas implements Runnable {
 			}
 			else {
 				directingArrow.clear();
-				if(kc.getKey(kc.actzero)) {
+				if(kc.getKey(kc.actzero) && cursor.getSelectedUnit() != null && cursor.getSelectedUnit().getSide() == turnOrder[turnNumber % turnOrder.length]) {
 					int newSelectX = cursor.selectX;
 					int newSelectY = cursor.selectY;
 					if(newSelectX != -1 && newSelectY != -1 && !(newSelectX == loggedSelectX && newSelectY == loggedSelectY)) {
@@ -252,12 +269,23 @@ public class Game extends Canvas implements Runnable {
 						}
 					}
 				}
+				
+				else if(kc.getKey(kc.turnend)) {
+					turnNumber++;
+					for(Unit[] row : b.getUnits()) {
+						for(Unit u : row) {
+							if(u != null) u.refresh();
+						}
+					}
+					System.out.println(turnNumber);
+				}
 			}
 		}
 
 		loggedSelectX = cursor.selectX;
 		loggedSelectY = cursor.selectY;
 		loggedSelectType = cursor.selectType;
+		if(loggedSelectX != -1 && loggedSelectY != -1)cursor.setSelectedUnit(b.getUnits()[loggedSelectY][loggedSelectX]);
 	}
 	
 	public void render() {

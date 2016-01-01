@@ -22,6 +22,7 @@ public class Sprite {
 	private int colorToSwap = Screen.NONCOLOR;
 	private int swapTargetColor = Screen.NONCOLOR;
 	private double shadeFactor = 1.0;
+	private int counter = -1;
 	
 	public Sprite(String spriteSheetPath, String motionsFilePath, int motionsStartLine) {
 		this.spriteSheetPath = spriteSheetPath;
@@ -70,6 +71,7 @@ public class Sprite {
 			else break;
 		}
 		currentFrame = animations.get(currentAnimation).get(frameKey);
+		if(counter != -1) counter++;
 	}
 	
 	public void render(Screen screen, int scale, boolean mirrorX, boolean mirrorY) {
@@ -112,5 +114,13 @@ public class Sprite {
 	
 	public void setShadeFactor(double shadeFactor) {
 		this.shadeFactor = shadeFactor;
+	}
+	
+	public int getCounter() {
+		return counter;
+	}
+	
+	public void setCounter(int counter) {
+		this.counter = counter;
 	}
 }

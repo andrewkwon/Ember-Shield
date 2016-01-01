@@ -13,6 +13,7 @@ public class OnScreenText {
 	private int textColor;
 	private int xMov = 0;
 	private int yMov = 0;
+	private int counter = -1;
 	
 	public OnScreenText(int x, int y, String text, int textColor) {
 		this.x = x;
@@ -44,6 +45,7 @@ public class OnScreenText {
 				yMov += yDif;
 			}
 		}
+		if(counter != -1) counter++;
 	}
 	
 	public void render(Screen screen) {
@@ -62,11 +64,31 @@ public class OnScreenText {
 		this.y = y;
 	}
 	
+	public int getXMov() {
+		return xMov;
+	}
+	
+	public int getYMov() {
+		return yMov;
+	}
+	
 	public void setXMov(int xMov) {
 		this.xMov = xMov;
 	}
 	
 	public void setYMov(int yMov) {
 		this.yMov = yMov;
+	}
+	
+	public void setTextColor(int textColor) {
+		this.textColor = textColor;
+	}
+	
+	public int getCounter() {
+		return counter;
+	}
+	
+	public void setCounter(int counter) {
+		this.counter = counter;
 	}
 }

@@ -64,7 +64,7 @@ public class DirectingArrow {
 					}
 				}
 				while(sprites.size() < directions.size()) {
-					sprites.add(new Sprite("/UserInterface.png", "/TestMotions.txt", 17));
+					sprites.add(new Sprite("/UserInterface.png", "/TestMotions.txt", 18));
 				}
 				while(sprites.size() > directions.size()) {
 					sprites.remove(sprites.size() - 1);

@@ -27,8 +27,8 @@ public class Board {
 	}
 	
 	public void removeUnit(Unit unit) {
-		for(int row = 0; row < 1; row++) {
-			for(int column = 0; column < 2; column++) {
+		for(int row = 0; row < boardHeight; row++) {
+			for(int column = 0; column < boardWidth; column++) {
 				if(unit == units[row][column]) {
 					units[row][column] = null;
 					return;
