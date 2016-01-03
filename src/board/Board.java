@@ -37,6 +37,20 @@ public class Board {
 		}
 	}
 	
+	public int[] getUnitCoordinates(Unit unit) {
+		int[] coordinates = new int[2];
+		for(int row = 0; row < boardHeight; row++) {
+			for(int col = 0; col < boardWidth; col++) {
+				if(units[row][col] == unit) {
+					coordinates[0] = row;
+					coordinates[1] = col;
+					break;
+				}
+			}
+		}
+		return coordinates;
+	}
+	
 	public void setUnit(int row, int column, Unit unit) {
 		units[row][column] = unit;
 	}

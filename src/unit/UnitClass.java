@@ -32,11 +32,13 @@ public class UnitClass {
 	
 	public boolean act(int actionId, Unit unitA, Unit unitB, Board board) {
 		if(actions.containsValue(actionId)) {
-			if(actionId == 0) actZero(unitA, unitB, board);
-			else if(actionId == 1) actOne(unitA, unitB, board);
-			else if(actionId == 2) actTwo(unitA, unitB, board);
-			else if(actionId == 3) actThree(unitA, unitB, board);
-			unitA.setActive(false);
+			//if the action can't be carried out, the unit is not set to inactive
+			boolean succeededInExecuting = false;
+			if(actionId == 0) succeededInExecuting = actZero(unitA, unitB, board);
+			else if(actionId == 1) succeededInExecuting = actOne(unitA, unitB, board);
+			else if(actionId == 2) succeededInExecuting = actTwo(unitA, unitB, board);
+			else if(actionId == 3) succeededInExecuting = actThree(unitA, unitB, board);
+			unitA.setActive(!succeededInExecuting);
 			return true;
 		}
 		return false;

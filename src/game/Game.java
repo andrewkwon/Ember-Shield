@@ -146,6 +146,8 @@ public class Game extends Canvas implements Runnable {
 		fredinator.setRemainingUses(1);
 		fredinator.setDoesPhysicalDamage(true);
 		fredinator.setStat("Mt", 1);
+		int[] rng = {1, 2};
+		fredinator.setRng(rng);
 		System.out.println("fred.giveItem(fredinator): " + fred.giveItem(fredinator));
 		System.out.println("fred.equip(0): " + fred.equip(0));
 		System.out.println("fred.getUnitClass() instanceof UnitAttacker: " + (fred.getUnitClass() instanceof UnitAttacker));
@@ -277,7 +279,7 @@ public class Game extends Canvas implements Runnable {
 							if(u != null) u.refresh();
 						}
 					}
-					System.out.println(turnNumber);
+					System.out.println(turnOrder[turnNumber % turnOrder.length]);
 				}
 			}
 		}

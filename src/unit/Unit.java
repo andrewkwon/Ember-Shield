@@ -131,6 +131,7 @@ public class Unit {
 	public void refresh() {
 		canMove = true;
 		active = true;
+		sprite.setShadeFactor(1.0);
 	}
 	
 	public void update(int clock, Board board, int row, int column) {
