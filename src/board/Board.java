@@ -1,6 +1,7 @@
 package board;
 import graphics.Screen;
 import graphics.SpriteSheet;
+import unit.Direction;
 import unit.Unit;
 
 public class Board {
@@ -68,12 +69,8 @@ public class Board {
 		if(units[row][column] == null) return false;
 		//direction: 0=right, 1=up, 2=left, 3=down
 		units[row][column].setFacing(direction);
-		int xDir = 0;
-		int yDir = 0;
-		if(direction % 4 == 0) xDir = 1;
-		else if(direction % 4 == 1) yDir = -1;
-		else if(direction % 4 == 2) xDir = -1;
-		else if(direction % 4 == 3) yDir = 1;
+		int xDir = Direction.getXDir(direction);
+		int yDir = Direction.getYDir(direction);
 		if(row + yDir < 0 || row + yDir >= boardHeight ||
 				column + xDir < 0 || column + xDir >= boardWidth ||
 				units[row + yDir][column + xDir] != null) return false;
