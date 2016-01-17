@@ -1,21 +1,22 @@
 package board;
 
 import graphics.Screen;
+import graphics.Tile;
 
 import java.util.Map;
 
 public class Land {
 
 	private String name;
-	private int tile;
+	private Tile tile;
 	private Map<String, Integer> buffs;
 	
-	public Land(String name, int tile) {
+	public Land(String name, int tileIndex) {
 		this.name = name;
-		this.tile = tile;
+		tile = new Tile(tileIndex);
 	}
 	
 	public void render(Screen screen, int x, int y, int scale) {
-		screen.render(x, y, tile, scale, Screen.NONCOLOR, Screen.NONCOLOR, false, false, 1.0);
+		tile.render(screen, x, y, scale);
 	}
 }

@@ -220,7 +220,7 @@ public class Unit {
 				damageNumbers.setY((y + yOffset) * scale);
 				damageNumbers.setCounter(0);
 			}
-			damageNumbers.render(screen);
+			damageNumbers.render(screen, 1);
 		}
 	}
 	

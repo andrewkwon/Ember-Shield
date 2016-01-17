@@ -9,7 +9,6 @@ public class OnScreenText {
 	//index of first character on sheet
 	public static final int startIndex = 12;
 	public static final String readableCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 ";
-	private int scale = 1;
 	private int textColor;
 	private int xMov = 0;
 	private int yMov = 0;
@@ -48,7 +47,7 @@ public class OnScreenText {
 		if(counter != -1) counter++;
 	}
 	
-	public void render(Screen screen) {
+	public void render(Screen screen, int scale) {
 		screen.setSheet(spriteSheetPath);
 		for(int i = 0; i < text.length(); i++) {
 			int tile = startIndex + readableCharacters.indexOf(text.charAt(i));

@@ -1,8 +1,10 @@
 package game;
 import unit.Unit;
+import graphics.DisplayBox;
 import graphics.OnScreenText;
 import graphics.Screen;
 import graphics.SpriteSheet;
+import graphics.TextBox;
 import item.Item;
 import unit.UnitClass;
 import item.Weapon;
@@ -68,6 +70,7 @@ public class Game extends Canvas implements Runnable {
 	private DirectingArrow directingArrow;
 	public int turnNumber = 0;
 	public String[] turnOrder;
+	private DisplayBox displayBox;
 	
 	public Game() {
 		super();
@@ -151,6 +154,7 @@ public class Game extends Canvas implements Runnable {
 		System.out.println("fred.giveItem(fredinator): " + fred.giveItem(fredinator));
 		System.out.println("fred.equip(0): " + fred.equip(0));
 		System.out.println("fred.getUnitClass() instanceof UnitAttacker: " + (fred.getUnitClass() instanceof UnitAttacker));
+		displayBox = new TextBox(47, 54, 16, "THIS IS TEXT IN A TEXTBOX", 511, 0);
 		
 		ArrayList<String> sides = new ArrayList<String>();
 		for(Unit[] row : b.getUnits()) {
@@ -301,6 +305,7 @@ public class Game extends Canvas implements Runnable {
 		b.render(screen, scale);
 		cursor.render(screen, scale);
 		directingArrow.render(screen, scale);
+		displayBox.render(screen, 1);
 		
 		for(int i = 0; i < pixels.length; i++) {
 			if (screen.getPixels()[i] != -1) {
@@ -357,6 +362,7 @@ public class Game extends Canvas implements Runnable {
 	
 	public synchronized void stop() {
 		running = false;
+		if(getBufferStrategy() != null) getBufferStrategy().dispose();
 	}
 	
 	public boolean hasWon(String objective, Board board) {
