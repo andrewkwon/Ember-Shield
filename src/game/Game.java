@@ -1,5 +1,6 @@
 package game;
 import unit.Unit;
+import unit.UnitInfoDisplay;
 import graphics.DisplayBox;
 import graphics.OnScreenText;
 import graphics.Screen;
@@ -48,7 +49,7 @@ public class Game extends Canvas implements Runnable {
 	private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 	private int[] colors = new int[SpriteSheet.COLOR_DEPTH * SpriteSheet.COLOR_DEPTH * SpriteSheet.COLOR_DEPTH];
 	private Screen screen;
-	private final int scale = 3;
+	public static final int scale = 3;
 	private KeyboardControls kc;
 	private Board b;
 	private Cursor cursor;
@@ -121,7 +122,7 @@ public class Game extends Canvas implements Runnable {
 		Land[][] terrain = new Land[tileMap.length][tileMap[0].length];
 		for(int x = 0; x < tileMap[0].length; x++) {
 			for(int y = 0; y < tileMap.length; y++) {
-				b.setLand(y, x, new Land("Test Land", tileMap[y][x]));
+				b.setLand(y, x, new Land("Test Land", "/Untitled.png", tileMap[y][x]));
 			}
 		}
 		
@@ -154,7 +155,6 @@ public class Game extends Canvas implements Runnable {
 		System.out.println("fred.giveItem(fredinator): " + fred.giveItem(fredinator));
 		System.out.println("fred.equip(0): " + fred.equip(0));
 		System.out.println("fred.getUnitClass() instanceof UnitAttacker: " + (fred.getUnitClass() instanceof UnitAttacker));
-		displayBox = new TextBox(47, 54, 16, "THIS IS TEXT IN A TEXTBOX", 511, 0);
 		
 		ArrayList<String> sides = new ArrayList<String>();
 		for(Unit[] row : b.getUnits()) {
@@ -226,10 +226,10 @@ public class Game extends Canvas implements Runnable {
 	
 	public void update() {
 		clock++;
-		for(int i = 0; i < scale && kc.getKey(kc.up) && screen.yOffset < 0; i++) screen.yOffset++;
-		for(int i = 0; i < scale && kc.getKey(kc.left) && screen.xOffset < 0; i++) screen.xOffset++;
-		for(int i = 0; i < scale && kc.getKey(kc.right) && screen.xOffset > width - b.getBoardWidth() * SpriteSheet.TILE_WIDTH * scale; i++) screen.xOffset--;
-		for(int i = 0; i < scale && kc.getKey(kc.down) && screen.yOffset > height - b.getBoardHeight() * SpriteSheet.TILE_WIDTH * scale; i++) screen.yOffset--;
+		for(int i = 0; i < scale && kc.getKey(kc.up) && screen.getYOffset() < 0; i++) screen.setYOffset(screen.getYOffset() + 1);
+		for(int i = 0; i < scale && kc.getKey(kc.left) && screen.getXOffset() < 0; i++) screen.setXOffset(screen.getXOffset() + 1);
+		for(int i = 0; i < scale && kc.getKey(kc.right) && screen.getXOffset() > width - b.getBoardWidth() * SpriteSheet.TILE_WIDTH * scale; i++) screen.setXOffset(screen.getXOffset() - 1);
+		for(int i = 0; i < scale && kc.getKey(kc.down) && screen.getYOffset() > height - b.getBoardHeight() * SpriteSheet.TILE_WIDTH * scale; i++) screen.setYOffset(screen.getYOffset() - 1);
 		b.update(clock);
 		Point point = getMousePosition();
 		int cursorX = -1;
@@ -287,6 +287,15 @@ public class Game extends Canvas implements Runnable {
 				}
 			}
 		}
+		else if(loggedSelectType == MouseEvent.BUTTON3) {
+			if(loggedSelectX != -1 && loggedSelectY != -1 && b.getUnits()[loggedSelectY][loggedSelectX] != null) {
+				displayBox = new UnitInfoDisplay(screen, b.getUnits()[loggedSelectY][loggedSelectX]);
+			}
+			else {
+				screen.setLocked(false);
+				displayBox = null;
+			}
+		}
 
 		loggedSelectX = cursor.selectX;
 		loggedSelectY = cursor.selectY;
@@ -305,7 +314,7 @@ public class Game extends Canvas implements Runnable {
 		b.render(screen, scale);
 		cursor.render(screen, scale);
 		directingArrow.render(screen, scale);
-		displayBox.render(screen, 1);
+		if(displayBox != null) displayBox.render(screen, 1);
 		
 		for(int i = 0; i < pixels.length; i++) {
 			if (screen.getPixels()[i] != -1) {

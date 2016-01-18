@@ -11,9 +11,9 @@ public class Land {
 	private Tile tile;
 	private Map<String, Integer> buffs;
 	
-	public Land(String name, int tileIndex) {
+	public Land(String name, String spriteSheetPath, int tileIndex) {
 		this.name = name;
-		tile = new Tile(tileIndex);
+		tile = new Tile(spriteSheetPath, tileIndex);
 	}
 	
 	public void render(Screen screen, int x, int y, int scale) {

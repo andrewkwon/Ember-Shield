@@ -8,7 +8,12 @@ public class OnScreenText {
 	public static final String spriteSheetPath = "/UserInterface.png";
 	//index of first character on sheet
 	public static final int startIndex = 12;
-	public static final String readableCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890 ";
+	public static final String readableCharacters = "ABCDEFGHIJKL"
+			+ "MNOPQRSTUVWX"
+			+ "YZ1234567890"
+			+ "abcdefghijkl"
+			+ "mnopqrstuvwx"
+			+ "yz().,\"':?! ";
 	private int textColor;
 	private int xMov = 0;
 	private int yMov = 0;

@@ -64,7 +64,7 @@ public class Sprite {
 		//time for the frame we are on
 		int frameKey = 0;
 		for(int key : times) {
-			if(key == -1);
+			if(key == -1) continue;
 			else if(animationTime >= key) {
 				frameKey = key;
 			}
@@ -122,5 +122,10 @@ public class Sprite {
 	
 	public void setCounter(int counter) {
 		this.counter = counter;
+	}
+	
+	public Tile getFrame() {
+		Tile frame = new Tile(spriteSheetPath, currentFrame);
+		return frame;
 	}
 }

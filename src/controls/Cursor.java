@@ -31,8 +31,8 @@ public class Cursor implements MouseListener {
 	}
 	
 	public void update(int clock, Screen screen, int mouseX, int mouseY, int scale) {
-		x = (mouseX - screen.xOffset) / scale;
-		y = (mouseY - screen.yOffset) / scale;
+		x = (mouseX - screen.getXOffset()) / scale;
+		y = (mouseY - screen.getYOffset()) / scale;
 		if(x < 0) x = 0;
 		else if(x >= screen.getWidth()) x = screen.getWidth() - 1;
 		if(y < 0) y = 0;

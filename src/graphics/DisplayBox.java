@@ -15,7 +15,7 @@ public class DisplayBox {
 	public static final int CORNER = 9;
 	public static final int HORIZONTAL_EDGE = 10;
 	public static final int VERTICAL_EDGE = 11;
-	public static final int INSIDE = 71;
+	public static final int INSIDE = 84;
 	
 	public DisplayBox(int x, int y, int width, int height, int color) {
 		this.x = x;
@@ -46,7 +46,7 @@ public class DisplayBox {
 				else if(row == 0 || row == tilesPerColumn - 1) tileType = HORIZONTAL_EDGE;
 				else if(column == 0 || column == tilesPerRow - 1) tileType = VERTICAL_EDGE;
 				
-				boxTiles[row][column] = new Tile(tileType);
+				boxTiles[row][column] = new Tile("/UserInterface.png", tileType);
 				if(row + 1 > tilesPerColumn / 2) boxTiles[row][column].setMirrorY(true);
 				if(column + 1 > tilesPerRow / 2) boxTiles[row][column].setMirrorX(true);
 				boxTiles[row][column].setColorToSwap(511);
@@ -55,7 +55,7 @@ public class DisplayBox {
 		}
 	}
 	
-	public void render(Screen screen, int scale) {		
+	public void render(Screen screen, int scale) {
 		for(int row = 0; row < tilesPerColumn; row++) {
 			for(int column = 0; column < tilesPerRow; column++) {
 				int tileX = x + column * SpriteSheet.TILE_WIDTH;
@@ -66,6 +66,22 @@ public class DisplayBox {
 				boxTiles[row][column].render(screen, tileX, tileY, scale);
 			}
 		}
+	}
+	
+	public int getX() {
+		return x;
+	}
+	
+	public int getY() {
+		return y;
+	}
+	
+	public void setX(int x) {
+		this.x = x;
+	}
+	
+	public void setY(int y) {
+		this.y = y;
 	}
 	
 	public void setWidth(int width) {

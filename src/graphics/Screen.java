@@ -10,8 +10,10 @@ public class Screen {
 	private Map<String, SpriteSheet> loadedSheets = new HashMap<String, SpriteSheet>(5); 
 	private SpriteSheet sheet;
 	private int[] pixels;
-	public int xOffset = 0;
-	public int yOffset = 0;
+	private int xOffset = 0;
+	private int yOffset = 0;
+	//determines whether offset can be adjusted
+	private boolean locked = false;
 	//noncolor: not used as a color value, pixels can't have this as a color value
 	public static int NONCOLOR = -2;
 	
@@ -68,12 +70,20 @@ public class Screen {
 		return pixels;
 	}
 	
+	public int getXOffset() {
+		return xOffset;
+	}
+	
+	public int getYOffset() {
+		return yOffset;
+	}
+	
 	public void setXOffset(int xOffset) {
-		this.xOffset = xOffset;
+		if(!locked) this.xOffset = xOffset;
 	}
 	
 	public void setYOffset(int yOffset) {
-		this.yOffset = yOffset;
+		if(!locked) this.yOffset = yOffset;
 	}
 	
 	public int getWidth() {
@@ -86,5 +96,9 @@ public class Screen {
 	
 	public void clearLoadedSheets() {
 		loadedSheets.clear();
+	}
+	
+	public void setLocked(boolean locked) {
+		this.locked = locked;
 	}
 }

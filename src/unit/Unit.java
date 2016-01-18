@@ -10,6 +10,7 @@ import graphics.OnScreenText;
 import graphics.Screen;
 import graphics.Sprite;
 import graphics.SpriteSheet;
+import graphics.Tile;
 
 public class Unit {
 	
@@ -21,7 +22,7 @@ public class Unit {
 	//growth of stats per level up
 	private UnitClass unitClass;
 	//max stat modifiers to be added?
-	private final int inventorySpace = 4;
+	public static final int inventorySpace = 4;
 	private Item[] inventory = new Item[inventorySpace];
 	private int equipped = -1;
 	private boolean canMove = true;
@@ -234,6 +235,10 @@ public class Unit {
 	
 	public Item getItem(int itemId) {
 		return inventory[itemId];
+	}
+	
+	public Map<String, Integer> getStats() {
+		return stats;
 	}
 	
 	public Integer getStat(String key) {
