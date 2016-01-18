@@ -226,10 +226,22 @@ public class Game extends Canvas implements Runnable {
 	
 	public void update() {
 		clock++;
-		for(int i = 0; i < scale && kc.getKey(kc.up) && screen.getYOffset() < 0; i++) screen.setYOffset(screen.getYOffset() + 1);
-		for(int i = 0; i < scale && kc.getKey(kc.left) && screen.getXOffset() < 0; i++) screen.setXOffset(screen.getXOffset() + 1);
-		for(int i = 0; i < scale && kc.getKey(kc.right) && screen.getXOffset() > width - b.getBoardWidth() * SpriteSheet.TILE_WIDTH * scale; i++) screen.setXOffset(screen.getXOffset() - 1);
-		for(int i = 0; i < scale && kc.getKey(kc.down) && screen.getYOffset() > height - b.getBoardHeight() * SpriteSheet.TILE_WIDTH * scale; i++) screen.setYOffset(screen.getYOffset() - 1);
+		for(int i = 0; i < scale && kc.getKey(kc.up) && screen.getYOffset() < 0; i++) {
+			kc.registerKeyPress(kc.up);
+			screen.setYOffset(screen.getYOffset() + 1);
+		}
+		for(int i = 0; i < scale && kc.getKey(kc.left) && screen.getXOffset() < 0; i++) {
+			kc.registerKeyPress(kc.left);
+			screen.setXOffset(screen.getXOffset() + 1);
+		}
+		for(int i = 0; i < scale && kc.getKey(kc.right) && screen.getXOffset() > width - b.getBoardWidth() * SpriteSheet.TILE_WIDTH * scale; i++) {
+			kc.registerKeyPress(kc.right);
+			screen.setXOffset(screen.getXOffset() - 1);
+		}
+		for(int i = 0; i < scale && kc.getKey(kc.down) && screen.getYOffset() > height - b.getBoardHeight() * SpriteSheet.TILE_WIDTH * scale; i++) {
+			kc.registerKeyPress(kc.down);
+			screen.setYOffset(screen.getYOffset() - 1);
+		}
 		b.update(clock);
 		Point point = getMousePosition();
 		int cursorX = -1;
@@ -251,6 +263,7 @@ public class Game extends Canvas implements Runnable {
 		
 		if(loggedSelectType == MouseEvent.BUTTON1 && loggedSelectX != -1 && loggedSelectY != -1 && b.getUnits()[loggedSelectY][loggedSelectX] != null) {
 			if(kc.getKey(kc.move) && cursor.getSelectedUnit() != null && cursor.getSelectedUnit().getSide() == turnOrder[turnNumber % turnOrder.length]) {
+				kc.registerKeyPress(kc.move);
 				int newSelectX = cursor.selectX;
 				int newSelectY = cursor.selectY;
 				if(directingArrow.getHeadX() == -1 || directingArrow.getHeadY() == -1) {
@@ -267,6 +280,7 @@ public class Game extends Canvas implements Runnable {
 			else {
 				directingArrow.clear();
 				if(kc.getKey(kc.actzero) && cursor.getSelectedUnit() != null && cursor.getSelectedUnit().getSide() == turnOrder[turnNumber % turnOrder.length]) {
+					kc.registerKeyPress(kc.actzero);
 					int newSelectX = cursor.selectX;
 					int newSelectY = cursor.selectY;
 					if(newSelectX != -1 && newSelectY != -1 && !(newSelectX == loggedSelectX && newSelectY == loggedSelectY)) {
@@ -274,16 +288,6 @@ public class Game extends Canvas implements Runnable {
 							b.getUnits()[loggedSelectY][loggedSelectX].getUnitClass().act(0, b.getUnits()[loggedSelectY][loggedSelectX], b.getUnits()[newSelectY][newSelectX], b);
 						}
 					}
-				}
-				
-				else if(kc.getKey(kc.turnend)) {
-					turnNumber++;
-					for(Unit[] row : b.getUnits()) {
-						for(Unit u : row) {
-							if(u != null) u.refresh();
-						}
-					}
-					System.out.println(turnOrder[turnNumber % turnOrder.length]);
 				}
 			}
 		}
@@ -295,6 +299,16 @@ public class Game extends Canvas implements Runnable {
 				screen.setLocked(false);
 				displayBox = null;
 			}
+		}
+		if(kc.getKey(kc.turnend) && !kc.keyHasRegisteredPress(kc.turnend)) {
+			kc.registerKeyPress(kc.turnend);
+			turnNumber++;
+			for(Unit[] row : b.getUnits()) {
+				for(Unit u : row) {
+					if(u != null) u.refresh();
+				}
+			}
+			System.out.println(turnOrder[turnNumber % turnOrder.length]);
 		}
 
 		loggedSelectX = cursor.selectX;

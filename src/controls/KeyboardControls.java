@@ -10,6 +10,9 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 public class KeyboardControls implements KeyListener {
 
 	private Map<Integer, Boolean> keys = new HashMap();
+	//Tells whether or not the game has registered and handled a key press, use it
+	//when you want the game to know it has already acted on a key's being pressed
+	private Map<Integer, Boolean> registeredPresses = new HashMap();
 	public int up = KeyEvent.VK_W;
 	public int left = KeyEvent.VK_A;
 	public int down = KeyEvent.VK_S;
@@ -24,6 +27,7 @@ public class KeyboardControls implements KeyListener {
 
 	public void keyReleased(KeyEvent arg0) {
 		setKey(arg0, false);
+		registeredPresses.put(arg0.getKeyCode(), false);
 	}
 
 	public void keyTyped(KeyEvent arg0) {
@@ -36,5 +40,13 @@ public class KeyboardControls implements KeyListener {
 	
 	public boolean getKey(int keyCode) {
 		return keys.getOrDefault(keyCode, false);
+	}
+	
+	public void registerKeyPress(int keyCode) {
+		registeredPresses.put(keyCode, true);
+	}
+	
+	public boolean keyHasRegisteredPress(int keyCode) {
+		return registeredPresses.getOrDefault(keyCode, false);
 	}
 }
