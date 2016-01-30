@@ -49,6 +49,7 @@ public class OnScreenText {
 				yMov += yDif;
 			}
 		}
+		//counter will tick only if started off
 		if(counter != -1) counter++;
 	}
 	

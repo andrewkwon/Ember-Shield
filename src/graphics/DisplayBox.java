@@ -16,6 +16,7 @@ public class DisplayBox {
 	public static final int HORIZONTAL_EDGE = 10;
 	public static final int VERTICAL_EDGE = 11;
 	public static final int INSIDE = 84;
+	private int counter;
 	
 	public DisplayBox(int x, int y, int width, int height, int color) {
 		this.x = x;
@@ -55,6 +56,11 @@ public class DisplayBox {
 		}
 	}
 	
+	public void update() {
+		//counter will tick only if started off
+		if(counter != -1) counter++;
+	}
+	
 	public void render(Screen screen, int scale) {
 		for(int row = 0; row < tilesPerColumn; row++) {
 			for(int column = 0; column < tilesPerRow; column++) {
@@ -92,5 +98,13 @@ public class DisplayBox {
 	public void setHeight(int height) {
 		this.height = height;
 		init();
+	}
+	
+	public int getCounter() {
+		return counter;
+	}
+	
+	public void setCounter(int counter) {
+		this.counter = counter;
 	}
 }

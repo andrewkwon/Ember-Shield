@@ -16,7 +16,7 @@ public class UnitInfoDisplay extends DisplayBox {
 	private Tile unitImage;
 	
 	public UnitInfoDisplay(Screen screen, Unit unit) {
-		super(-screen.getXOffset() + SpriteSheet.TILE_WIDTH * Game.scale / 2, -screen.getYOffset() + SpriteSheet.TILE_WIDTH * Game.scale / 2, 32 * 11 * 3, 32 * 4 * 3, 434);
+		super(-screen.getXOffset() + SpriteSheet.TILE_WIDTH * Game.scale / 2, -screen.getYOffset() + SpriteSheet.TILE_WIDTH * Game.scale / 2, 32 * 11 * 3, 32 * 4 * 3, 506);
 		this.unit = unit;
 		unitImage = unit.getSprite().getFrame();
 		name = new OnScreenText((getX() + 3 + 1) + SpriteSheet.TILE_WIDTH * Game.scale, (getY() + 3), unit.getName() + "   HP:" + unit.getStat("HP"), 0);

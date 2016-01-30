@@ -72,6 +72,7 @@ public class Game extends Canvas implements Runnable {
 	public int turnNumber = 0;
 	public String[] turnOrder;
 	private DisplayBox displayBox;
+	private TextBox turnTeller;
 	
 	public Game() {
 		super();
@@ -79,12 +80,14 @@ public class Game extends Canvas implements Runnable {
 		setPreferredSize(new Dimension(width, height));
 		setMinimumSize(new Dimension(width, height));
 		setMaximumSize(new Dimension(width, height));
+		//waits for program to finish what it's doing before stopping or closing
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent we) {
 				while(currentlyUpdating == true || currentlyRendering == true) Thread.yield();
 				stop();
 				frame.setVisible(false);
+				if(getBufferStrategy() != null) getBufferStrategy().dispose();
 				frame.dispose();
 			}
 		});
@@ -104,6 +107,7 @@ public class Game extends Canvas implements Runnable {
 		running = true;
 		clock = 0;
 		
+		//init colors
 		for(int r = 0; r < SpriteSheet.COLOR_DEPTH; r++) {
 			for(int g = 0; g < SpriteSheet.COLOR_DEPTH; g++) {
 				for(int b = 0; b < SpriteSheet.COLOR_DEPTH; b++) {
@@ -117,6 +121,7 @@ public class Game extends Canvas implements Runnable {
 		}
 		screen = new Screen(width, height);
 		
+		//init board
 		b = new Board(tileMap[0].length, tileMap.length);
 		b.setLandSpriteSheetPath("/Untitled.png");
 		Land[][] terrain = new Land[tileMap.length][tileMap[0].length];
@@ -156,6 +161,7 @@ public class Game extends Canvas implements Runnable {
 		System.out.println("fred.equip(0): " + fred.equip(0));
 		System.out.println("fred.getUnitClass() instanceof UnitAttacker: " + (fred.getUnitClass() instanceof UnitAttacker));
 		
+		//init sides
 		ArrayList<String> sides = new ArrayList<String>();
 		for(Unit[] row : b.getUnits()) {
 			for(Unit u : row) {
@@ -226,6 +232,7 @@ public class Game extends Canvas implements Runnable {
 	
 	public void update() {
 		clock++;
+		//scrolling screen
 		for(int i = 0; i < scale && kc.getKey(kc.up) && screen.getYOffset() < 0; i++) {
 			kc.registerKeyPress(kc.up);
 			screen.setYOffset(screen.getYOffset() + 1);
@@ -246,6 +253,7 @@ public class Game extends Canvas implements Runnable {
 		Point point = getMousePosition();
 		int cursorX = -1;
 		int cursorY = -1;
+		//adjust cursor color based on what it is lying on 
 		if(point != null) { 
 			cursor.update(clock, screen, point.x, point.y, scale);
 			cursorX = cursor.x;
@@ -260,8 +268,9 @@ public class Game extends Canvas implements Runnable {
 				else if(cursorUnit.getSide().equals("Neutral")) cursor.setSpriteColor((Unit.NEUTRAL_OUTLINE * 4) & 511);
 			}
 		}
-		
+		//if unit selected
 		if(loggedSelectType == MouseEvent.BUTTON1 && loggedSelectX != -1 && loggedSelectY != -1 && b.getUnits()[loggedSelectY][loggedSelectX] != null) {
+			//if moving unit
 			if(kc.getKey(kc.move) && cursor.getSelectedUnit() != null && cursor.getSelectedUnit().getSide() == turnOrder[turnNumber % turnOrder.length]) {
 				kc.registerKeyPress(kc.move);
 				int newSelectX = cursor.selectX;
@@ -277,6 +286,7 @@ public class Game extends Canvas implements Runnable {
 					b.moveUnitAlongPath(loggedSelectY, loggedSelectX, directingArrow.readDirections());
 				}
 			}
+			
 			else {
 				directingArrow.clear();
 				if(kc.getKey(kc.actzero) && cursor.getSelectedUnit() != null && cursor.getSelectedUnit().getSide() == turnOrder[turnNumber % turnOrder.length]) {
@@ -291,6 +301,7 @@ public class Game extends Canvas implements Runnable {
 				}
 			}
 		}
+		//if unit info should be displayed
 		else if(loggedSelectType == MouseEvent.BUTTON3) {
 			if(loggedSelectX != -1 && loggedSelectY != -1 && b.getUnits()[loggedSelectY][loggedSelectX] != null) {
 				displayBox = new UnitInfoDisplay(screen, b.getUnits()[loggedSelectY][loggedSelectX]);
@@ -300,6 +311,7 @@ public class Game extends Canvas implements Runnable {
 				displayBox = null;
 			}
 		}
+		//if turn is ended
 		if(kc.getKey(kc.turnend) && !kc.keyHasRegisteredPress(kc.turnend)) {
 			kc.registerKeyPress(kc.turnend);
 			turnNumber++;
@@ -308,9 +320,43 @@ public class Game extends Canvas implements Runnable {
 					if(u != null) u.refresh();
 				}
 			}
-			System.out.println(turnOrder[turnNumber % turnOrder.length]);
+			//turn change message
+			String whoseTurn = "";
+			int messageColor = SpriteSheet.TRANSPARENT_COLOR;
+			if(turnOrder[turnNumber % turnOrder.length] == null) {
+				whoseTurn = "NOBODY'S";
+				messageColor = 0;
+			}
+			else if(turnOrder[turnNumber % turnOrder.length].equals("Player")) {
+				whoseTurn = "PLAYER'S";
+				messageColor = (Unit.PLAYER_OUTLINE * 4) & 511;
+			}
+			else if(turnOrder[turnNumber % turnOrder.length].equals("Enemy")) {
+				whoseTurn = "ENEMY'S";
+				messageColor = (Unit.ENEMY_OUTLINE * 4) & 511;
+			}
+			else if(turnOrder[turnNumber % turnOrder.length].equals("Ally")) {
+				whoseTurn = "ALLY'S";
+				messageColor = (Unit.ALLY_OUTLINE * 4) & 511;
+			}
+			else if(turnOrder[turnNumber % turnOrder.length].equals("Neutral")) {
+				whoseTurn = "NEUTRAL'S";
+				messageColor = (Unit.NEUTRAL_OUTLINE * 4) & 511;
+			}
+			String turnMessage = whoseTurn + " TURN";
+			turnTeller = new TextBox((width - SpriteSheet.TILE_WIDTH * turnMessage.length()) / 2 - screen.getXOffset(), (height - 2 * SpriteSheet.TILE_WIDTH - 2) / 2 - screen.getYOffset(), turnMessage.length(), turnMessage, 506, messageColor);
+			turnTeller.setCounter(0);
+			screen.setLocked(true);
 		}
-
+		//update turn change message box if there is one
+		if(turnTeller != null) {
+			turnTeller.update();
+			if(turnTeller.getCounter() >= 45) {
+				screen.setLocked(false);
+				turnTeller = null;
+			}
+		}
+		
 		loggedSelectX = cursor.selectX;
 		loggedSelectY = cursor.selectY;
 		loggedSelectType = cursor.selectType;
@@ -329,6 +375,7 @@ public class Game extends Canvas implements Runnable {
 		cursor.render(screen, scale);
 		directingArrow.render(screen, scale);
 		if(displayBox != null) displayBox.render(screen, 1);
+		if(turnTeller != null) turnTeller.render(screen, 1);
 		
 		for(int i = 0; i < pixels.length; i++) {
 			if (screen.getPixels()[i] != -1) {
@@ -385,7 +432,6 @@ public class Game extends Canvas implements Runnable {
 	
 	public synchronized void stop() {
 		running = false;
-		if(getBufferStrategy() != null) getBufferStrategy().dispose();
 	}
 	
 	public boolean hasWon(String objective, Board board) {
