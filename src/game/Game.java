@@ -376,7 +376,7 @@ public class Game extends Canvas implements Runnable {
 		directingArrow.render(screen, scale);
 		if(displayBox != null) displayBox.render(screen, 1);
 		if(turnTeller != null) turnTeller.render(screen, 1);
-		
+		screen.updateScreen();
 		for(int i = 0; i < pixels.length; i++) {
 			if (screen.getPixels()[i] != -1) {
 				pixels[i] = colors[screen.getPixels()[i]];
