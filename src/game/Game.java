@@ -143,7 +143,8 @@ public class Game extends Canvas implements Runnable {
 		fred.setStat("Str", 1);
 		fred.setStat("Move", 4);
 		fred.setSide("Player");
-		bob.setUnitClass(new UnitClass("freddy"));
+		bob.setUnitClass(new UnitAttacker("bobby"));
+		bob.getUnitClass().setEquippableItemTypes(types);
 		bob.setStat("HP", 1);
 		bob.setStat("Str", 1);
 		bob.setStat("Move", 2);
@@ -160,6 +161,16 @@ public class Game extends Canvas implements Runnable {
 		System.out.println("fred.giveItem(fredinator): " + fred.giveItem(fredinator));
 		System.out.println("fred.equip(0): " + fred.equip(0));
 		System.out.println("fred.getUnitClass() instanceof UnitAttacker: " + (fred.getUnitClass() instanceof UnitAttacker));
+		Weapon bobinator = new Weapon("Bobinator");
+		bobinator.setUsable(true);
+		bobinator.setItemType(types[0]);
+		bobinator.setRemainingUses(1);
+		bobinator.setDoesPhysicalDamage(true);
+		bobinator.setStat("Mt", 1);
+		bobinator.setRng(rng);
+		System.out.println("bob.giveItem(bobinator): " + bob.giveItem(bobinator));
+		System.out.println("bob.equip(0): " + bob.equip(0));
+		System.out.println("bob.getUnitClass() instanceof UnitAttacker: " + (bob.getUnitClass() instanceof UnitAttacker));
 		
 		//init sides
 		ArrayList<String> sides = new ArrayList<String>();
@@ -216,17 +227,6 @@ public class Game extends Canvas implements Runnable {
 				tickCount = 0;
 				frameCount = 0;
 			}
-			
-			/*display(b);
-			takeCommand(b);
-			if(hasWon(objective, b)) {
-				System.out.println("YOU WIN");
-				stop();
-			}
-			else if(hasLost(b)) {
-				System.out.println("GAME OVER");
-				stop();
-			}*/
 		}
 	}
 	
@@ -348,6 +348,19 @@ public class Game extends Canvas implements Runnable {
 			turnTeller.setCounter(0);
 			screen.setLocked(true);
 		}
+		//check if game is over
+		if(hasWon(objective, b)) {
+			String turnMessage = "YOU WIN!";
+			turnTeller = new TextBox((width - SpriteSheet.TILE_WIDTH * turnMessage.length()) / 2 - screen.getXOffset(), (height - 2 * SpriteSheet.TILE_WIDTH - 2) / 2 - screen.getYOffset(), turnMessage.length(), turnMessage, 506, (Unit.PLAYER_OUTLINE * 4) & 511);
+			turnTeller.setCounter(0);
+			screen.setLocked(true);
+		}
+		else if(hasLost(b)) {
+			String turnMessage = "YOU LOSE.";
+			turnTeller = new TextBox((width - SpriteSheet.TILE_WIDTH * turnMessage.length()) / 2 - screen.getXOffset(), (height - 2 * SpriteSheet.TILE_WIDTH - 2) / 2 - screen.getYOffset(), turnMessage.length(), turnMessage, 506, (Unit.ENEMY_OUTLINE * 4) & 511);
+			turnTeller.setCounter(0);
+			screen.setLocked(true);
+		}
 		//update turn change message box if there is one
 		if(turnTeller != null) {
 			turnTeller.update();
@@ -386,48 +399,6 @@ public class Game extends Canvas implements Runnable {
 		g.drawImage(image, 0, 0, width, height, null);
 		g.dispose();
 		bs.show();
-	}
-	
-	public void display(Board board) {
-		String toPrint = "";
-		for(int row = 0; row < board.getBoardHeight(); row++) {
-			for(int column = 0; column < board.getBoardWidth(); column++) {
-				Unit unit = board.getUnits()[row][column];
-				if(unit == null) {
-					toPrint += " 0";
-				}
-				else toPrint += (" " + unit.getName().substring(0, 1).toUpperCase());
-			}
-			System.out.println(toPrint);
-			toPrint = "";
-		}
-	}
-	
-	public void takeCommand(Board board) {
-		Scanner sc = new Scanner(System.in);
-		boolean stillTakingCommands = true;
-		String[] coms = {"help", "sel \\d+ \\d+", "actzero \\d+ \\d+"};
-		while(stillTakingCommands) {
-			String command = sc.nextLine();
-			if(command.equals("help")) {
-				for(String com : coms) System.out.println(com);
-			}
-			if(command.matches("sel \\d+ \\d+")) {
-				int row = Integer.parseInt(command.split(" ")[1]);
-				int column = Integer.parseInt(command.split(" ")[2]);
-				Unit selectedA = board.getUnits()[row][column];
-				System.out.println("Selected " + selectedA.getName());
-				command = sc.nextLine();
-				if(command.matches("actzero \\d+ \\d+")) {
-					row = Integer.parseInt(command.split(" ")[1]);
-					column = Integer.parseInt(command.split(" ")[2]);
-					Unit selectedB = board.getUnits()[row][column];
-					selectedA.getUnitClass().actZero(selectedA, selectedB, board);
-					stillTakingCommands = false;
-				}
-			}
-		}
-		sc.close();
 	}
 	
 	public synchronized void stop() {
